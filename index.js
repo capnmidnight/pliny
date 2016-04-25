@@ -818,6 +818,8 @@
   pliny.formats = formatters;
   // Just get the raw data
   pliny.get = openBag.bind(null, pliny.database);
+  // Forward on the markdown functionality
+  pliny.markdown = marked;
 
   pliny.setEnumerationValues = setEnumerationValues;
 
