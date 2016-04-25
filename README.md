@@ -1,60 +1,45 @@
-# Primrose VR: Productive Virtual Reality
-The Primrose Framework helps web developers create virtual reality experiences within standard web browsers on desktop and mobile devices alike. Through its common interaction space, design tools, interface objects, and user experience best-practices, users and developers collaborate to create interactive multimedia and productivity applications.
+# Writing new documentation with Pliny
 
-## Example
-    // different operating systems have different keyboard shortcuts.
-    var modA = isOSX ? "metaKey" : "ctrlKey",
-        modB = isOSX ? "altKey" : "shiftKey",
-        execKey = isOSX ? "E" : "SPACE",
+Documentation in Primrose is recorded via explicit function calls, rather than the JavaDoc-style of parsing comment blocks. The documentation pages are built loading the production Primrose library itself and querying its documentation database live. New code features and documentation for them are delivered in one cohesive package.
+  
+## Example:
 
-        // a place to stow an object we will modify out of the loaded scene file
-        terminal = null,
+    pliny.function( {
+      parent: "Primrose.Random",
+      name: "number",
+      description: "Returns a random floating-point number on a given range [min, max), i.e. min is inclusive, max is exclusive.",
+      parameters: [
+        {name: "min", type: "Number", description: "The included minimum side of the range of numbers."},
+        {name: "max", type: "Number", description: "The excluded maximum side of the range of numbers."}
+      ],
+      returns: "A random number as good as your JavaScript engine supports with Math.random(), which is not good enough for crypto, but is certainly good enough for games."
+    });
+    Primrose.Random.number = function ( min, max ) {
+      return Math.random() * ( max - min ) + min;
+    };
+  
+With the documentation being built in to the Primrose library itself, the latest documentation is always accessible from code, even during live-programming sessions, both in your scripts and in your browser's developer console.
 
-        // setup the VR environment
-        app = new Primrose.BrowserEnvironment( "Commodore", {
-          sceneModel: "commodore_pet.json",
-          skyTexture: "/images/bg2.jpg",
-          groundTexture: "/images/deck.png"
-        } );
+If you ever have a question about how a function works, you can pop open the console and type in a query to the documentation database with the object's full-qualified name. For example, to read back the documentation specified above, we would type `pliny("Primrose.HTTP.XHR")`.
 
-    function isExecuteCommand ( evt ) {
-      return evt[modA] && evt[modB] && evt.keyCode === Primrose.Keys[execKey];
-    }
+Alternatively, many types of objects (namespaces, functions, classes, enumerations), have a convenience function added to them to display their own help file, e.g. `Primrose.HTTP.XHR.help()`.
 
-    app.addEventListener( "keydown", function ( evt ) {
-      if ( terminal.running &&
-          terminal.waitingForInput &&
-          evt.keyCode === Primrose.Keys.ENTER ) {
-        terminal.sendInput( evt );
-      }
-      else if ( !terminal.running &&
-          isExecuteCommand( evt ) ) {
-        terminal.execute();
-      }
-    } );
+    [function] Primrose.HTTP.XHR([String] method, [String] type, [String] url, [Object] data, [Function] success, [Function] error, [Function] progress)
+    parent: Primrose.HTTP
 
-    app.addEventListener( "ready", function () {
+    Wraps up the XMLHttpRequest object into a workflow that is easier for me to handle: a single function call. Can handle both GETs and POSTs, with or  without a payload.
 
-      // A hack to reposition the objects in the scene because the model file is a little janky
-      app.scene.traverse( function ( obj ) {
-        if ( obj.name && obj.parent && obj.parent.uuid === app.scene.uuid ) {
-          obj.position.y += app.avatarHeight * 0.9;
-          obj.position.z -= 1;
-        }
-      } );
+    parameters:
+    0: [String] method - The HTTP Verb being used for the request.
+    1: [String] type - How the response should be interpreted. Defaults to "text". "json", "arraybuffer", and other values are also available. See the ref<1></1>.
+    2: [String] url - The resource to which the request is being sent.
+    3: [Object] data - The data object to use as the request body payload, if this is a PUT request.
+    4: [Function] success - (Optional) the callback to issue whenever the request finishes successfully, even going so far as to check HTTP status code on the OnLoad event.
+    5: [Function] error - (Optional) the callback to issue whenever an error occurs.
+    6: [Function] progress - (Optional) A callback function to be called as the download from the server progresses.
 
-      // the `convertToEditor` method makes an editor out of existing geometry.
-      var editor = app.convertToEditor( app.scene.Screen );
-      editor.padding = 10;
-      terminal = new Primrose.Text.Terminal( app.scene.Screen.textarea );
-      terminal.loadFile( "oregon.bas" );
-    } );
-    
-## Issues
-The issues list is not here on Github, it's on [Trello](https://trello.com/b/NVZsaC1P/primrosevr).
+    references:
+    0: MDN - XMLHttpRequest - responseType - https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest#xmlhttprequest-responsetype
 
-## Licensing
-Primrose is free, open source software (GPLv3) and may readily bewith other FOSS projects.
-
-## Contributions
-To simplify licensing issues, contributions to Primrose require a copyright assignment to me, Sean T. McBeth. Please include your name and email address in the CONTRIBUTORS.md file with your pull request. This will serve as your copyright assignment.
+    examples:
+    0: Make a GET request. - Typically, you would use one of the other functions in the Primrose.HTTP namespace, but the XHR function is provided as a fallback in case those others do not meet your need...
