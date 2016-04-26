@@ -15,7 +15,11 @@ gulp.task("lint", function () {
 gulp.task("default", ["lint"], function () {
   return gulp.src(["node_modules/marked/marked.min.js", "index.js"])
     .pipe(concat("pliny.js"))
+    .pipe(babel({
+      sourceMap: false,
+	  presets: ["es2015"]
+	}))
     .pipe(uglify())
-    .pipe(rename({ suffix: ".min" }))
+	.pipe(rename({ suffix: ".min" }))
     .pipe(gulp.dest("./"));
 });
