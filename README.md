@@ -22,8 +22,6 @@ With the documentation being built in to the Primrose library itself, the latest
 
 If you ever have a question about how a function works, you can pop open the console and type in a query to the documentation database with the object's full-qualified name. For example, to read back the documentation specified above, we would type `pliny("Primrose.HTTP.XHR")`.
 
-Alternatively, many types of objects (namespaces, functions, classes, enumerations), have a convenience function added to them to display their own help file, e.g. `Primrose.HTTP.XHR.help()`.
-
     [function] Primrose.HTTP.XHR([String] method, [String] type, [String] url, [Object] data, [Function] success, [Function] error, [Function] progress)
     parent: Primrose.HTTP
 

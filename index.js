@@ -288,9 +288,7 @@
 
   var scriptPattern = /\bpliny\s*\.\s*(\w+)/gm;
   /////
-  // Finds the actual object in the scope hierarchy, and:
-  //  A) looks for contextual scripts that might be defined in this object
-  //  B) creates a live-accessible help function on the object, that we can call from the browser console/Node REPL
+  // Finds the actual object in the scope hierarchy, and looks for contextual scripts that might be defined in this object
   // 
   // @param {String} name - a period-delimited list of object accessors, naming the real object we want to access. 
   // @returns {Object} - the actual object the name refers to, or undefined if such an object exists.
@@ -316,9 +314,6 @@
           pliny[fieldType].call(null, fieldInfo);
         }
       }
-
-      // Create the live-accessible documentation function
-      obj.help = pliny.bind(null, name);
     }
     return obj;
   }
