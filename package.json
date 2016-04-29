@@ -1,7 +1,7 @@
 {
   "name": "pliny",
   "description": "Pliny is a documentation construction system. You create live documentation objects on code assets with pliny, then you read back those documentation objects with pliny.",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "author": "Sean T. McBeth <sean@seanmcbeth.com> (https://www.seanmcbeth.com)",
   "license": "GPL-3.0",
   "homepage": "http://www.primrosevr.com",
@@ -13,7 +13,7 @@
   "files": [
     "LICENSE.md",
     "README.md",
-    "index.js",
+    "pliny.js",
     "pliny.min.js"
   ],
   "keywords": [

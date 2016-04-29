@@ -17,9 +17,10 @@ gulp.task("default", ["lint"], function () {
     .pipe(concat("pliny.js"))
     .pipe(babel({
       sourceMap: false,
-	  presets: ["es2015"]
-	}))
+      presets: ["es2015"]
+    }))
+    .pipe(gulp.dest("./"))
     .pipe(uglify())
-	.pipe(rename({ suffix: ".min" }))
+    .pipe(rename({ suffix: ".min" }))
     .pipe(gulp.dest("./"));
 });
