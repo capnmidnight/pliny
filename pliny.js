@@ -672,7 +672,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
   ///
   function setContextualHelp(name) {
     // Find the real object
-    var obj = openBag(window, name);
+    var obj = openBag(database, name);
     if (obj) {
       // Look for contextual scripts
       if (typeof obj === "function") {
@@ -1145,7 +1145,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
   // Just get the raw data
   pliny.get = openBag.bind(null, pliny.database);
   // Forward on the markdown functionality
-  pliny.markdown = marked;
+  pliny.markdown = markdown;
   // Strip pliny calls out of a source file and deposit them into a separate file.
   pliny.carve = function (source, destination, callback) {
     var fs = require("fs");
@@ -1203,6 +1203,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     }
   });
   return module;
-}("pliny"), function (name) {
+}("pliny"), typeof module !== 'undefined' && require || function (name) {
   return window[name];
 });

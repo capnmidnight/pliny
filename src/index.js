@@ -34,7 +34,7 @@
   // Pliny's author is not smart enough to figure out how to make it possible //
   // to use it to document itself, so here's a bunch of comments.             //
   //////////////////////////////////////////////////////////////////////////////
-  
+
   var markdown = require("marked");
 
   // The default storage location.
@@ -295,7 +295,7 @@
   ///
   function setContextualHelp(name) {
     // Find the real object
-    var obj = openBag(window, name);
+    var obj = openBag(database, name);
     if (obj) {
       // Look for contextual scripts
       if (typeof obj === "function") {
@@ -814,45 +814,45 @@
   // Just get the raw data
   pliny.get = openBag.bind(null, pliny.database);
   // Forward on the markdown functionality
-  pliny.markdown = marked;
+  pliny.markdown = markdown;
   // Strip pliny calls out of a source file and deposit them into a separate file.
   pliny.carve = function (source, destination, callback) {
-      var fs = require("fs");
-      fs.readFile(source, "utf-8", function (err, txt) {
-        var matches,
-          left = 0,
-          outputLeft = "",
-          outputRight = "",
-          test = /pliny\.\w+/g;
-        while (matches = test.exec(txt)) {
-          var sub = txt.substring(left, matches.index);
-          outputLeft += sub;
-          var depth = 0, inString = false, found = false;
-          for (left = matches.index + matches.length; left < txt.length; ++left) {
-            if (txt[left] === "\"" && (left === 0 || txt[left - 1] !== "\\"))
-              inString = !inString;
-            if (!inString) {
-              if (txt[left] === "(") {
-                found = true;
-                ++depth;
-              }
-              else if (txt[left] === ")")
-                --depth;
+    var fs = require("fs");
+    fs.readFile(source, "utf-8", function (err, txt) {
+      var matches,
+        left = 0,
+        outputLeft = "",
+        outputRight = "",
+        test = /pliny\.\w+/g;
+      while (matches = test.exec(txt)) {
+        var sub = txt.substring(left, matches.index);
+        outputLeft += sub;
+        var depth = 0, inString = false, found = false;
+        for (left = matches.index + matches.length; left < txt.length; ++left) {
+          if (txt[left] === "\"" && (left === 0 || txt[left - 1] !== "\\"))
+            inString = !inString;
+          if (!inString) {
+            if (txt[left] === "(") {
+              found = true;
+              ++depth;
             }
-            if (depth === 0 && found)
-              break;
+            else if (txt[left] === ")")
+              --depth;
           }
-          while (left < txt.length && /[;\) \r\n]/.test(txt[left])) {
-            left++;
-          }
-
-          outputRight += txt.substring(matches.index, left);
+          if (depth === 0 && found)
+            break;
         }
-        outputLeft += txt.substring(left);
-        fs.writeFile(source, outputLeft, function () {
-          fs.writeFile(destination, outputRight, callback);
-        });
+        while (left < txt.length && /[;\) \r\n]/.test(txt[left])) {
+          left++;
+        }
+
+        outputRight += txt.substring(matches.index, left);
+      }
+      outputLeft += txt.substring(left);
+      fs.writeFile(source, outputLeft, function () {
+        fs.writeFile(destination, outputRight, callback);
       });
+    });
   };
 
   pliny.setEnumerationValues = setEnumerationValues;
@@ -888,6 +888,6 @@
     }
   });
   return module;
-})("pliny"), function (name) {
+})("pliny"), typeof module !== 'undefined' && require || function (name) {
   return window[name];
 });
