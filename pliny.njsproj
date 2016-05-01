@@ -34,12 +34,16 @@
     <Content Include="README.md" />
     <Content Include="package.json" />
     <Content Include="LICENSE.md" />
-    <Content Include="index.js" />
+    <Content Include="src\index.js" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="gulpfile.js" />
+    <Compile Include="index.js" />
     <Compile Include="pliny.js" />
     <Compile Include="pliny.min.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="src\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <!--Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them.-->
