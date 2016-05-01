@@ -6,14 +6,14 @@
   uglify = require("gulp-uglify");
 
 gulp.task("lint", function () {
-  return gulp.src("index.js")
+  return gulp.src("src/index.js")
     .pipe(jshint({
       multistr: true
     }));
 });
 
 gulp.task("default", ["lint"], function () {
-  return gulp.src(["node_modules/marked/marked.min.js", "index.js"])
+  return gulp.src(["node_modules/marked/marked.min.js", "src/index.js"])
     .pipe(concat("pliny.js"))
     .pipe(babel({
       sourceMap: false,
