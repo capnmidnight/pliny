@@ -283,7 +283,13 @@
     }
 
     function setEnumerationValues(name) {
-      var enumeration = require(name);
+      var enumeration = null;
+      try {
+        enumeration = require(name);
+      }
+      catch (exp) {
+        enumeration = null;
+      }
       if (!enumeration) {
         setTimeout(setEnumerationValues, 1, name);
       }
@@ -491,7 +497,7 @@
         } else if (value instanceof Array) {
           output += this.formatArray(obj, propertyName, value);
         } else if (propertyName === "parent") {
-          output += "<p>Contained in <a href=\"#" + pliny.get(value).id + "\">" + value + "</a></p>";
+          output += "<p>Contained in <a href=\"index.html#" + pliny.get(value).id + "\">" + value + "</a></p>";
         } else if (propertyName === "description") {
           output += markdown(value);
         } else if (propertyName === "returns") {
@@ -526,7 +532,7 @@
         var output = "";
         for (var i = 0; i < arr.length; ++i) {
           var ex = arr[i];
-          output += "<div><h3><a href=\"#" + ex.id + "\">" + ex.name + "</a></h3>" + markdown(ex.description) + "</div>";
+          output += "<div><h3><a href=\"index.html#" + ex.id + "\">" + ex.name + "</a></h3>" + markdown(ex.description) + "</div>";
         }
         return output;
       },
@@ -539,7 +545,7 @@
         var parts = { open: "", closed: "" };
         for (var i = 0; i < arr.length; ++i) {
           var issue = arr[i],
-            str = "<div><h3><a href=\"#" + issue.id + "\">" + issue.issueID + ": " + issue.name + " [" + issue.type + "]</a></h3>" + markdown(issue.description) + "</div>";
+            str = "<div><h3><a href=\"index.html#" + issue.id + "\">" + issue.issueID + ": " + issue.name + " [" + issue.type + "]</a></h3>" + markdown(issue.description) + "</div>";
           parts[issue.type] += str;
         }
         return parts.open + "<h2>Closed Issues</h2>" + parts.closed;
@@ -633,7 +639,7 @@
 
         output += "<" + tag + ">";
         if (isContainer && !topLevel) {
-          output += "<a href=\"#" + p.id + "\">";
+          output += "<a href=\"index.html#" + p.id + "\">";
         }
 
         output += "<code>" + (topLevel && p.fieldType !== "example" && p.fullName || p.name);
