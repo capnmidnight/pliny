@@ -619,6 +619,15 @@
           } else {
             desc = n.description;
           }
+
+          if (n.optional) {
+            desc = "(Optional) " + desc;
+          }
+
+          if (n.default !== undefined) {
+            desc += " Defaults to <code>" + n.default + "</code>.";
+          }
+
           s += "<dl><dt>" + this.shortDescription(false, n) + "</dt><dd>" + markdown(desc) + "</dd></dl>";
         } else {
           s += this.shortDescription(false, n);
