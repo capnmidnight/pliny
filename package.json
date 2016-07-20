@@ -1,7 +1,7 @@
 {
   "name": "pliny",
   "description": "Pliny is a documentation construction system. You create live documentation objects on code assets with pliny, then you read back those documentation objects with pliny.",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "author": "Sean T. McBeth <sean@seanmcbeth.com> (https://www.seanmcbeth.com)",
   "license": "GPL-3.0",
   "homepage": "http://www.primrosevr.com",
@@ -24,13 +24,6 @@
     "marked": "^0.3.5"
   },
   "devDependencies": {
-    "babel-preset-es2015": "^6.6.0",
-    "gulp": "^3.9.1",
-    "gulp-babel": "^6.1.2",
-    "gulp-concat": "^2.6.0",
-    "gulp-jshint": "^2.0.0",
-    "gulp-rename": "^1.2.2",
-    "gulp-uglify": "^1.5.3",
-    "jshint": "^2.9.2"
+    "notiontheory-basic-build": "^1.0.0"
   }
 }

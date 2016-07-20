@@ -64,7 +64,8 @@
     function hash(buf) {
       var s1 = 1,
         s2 = 0,
-        buffer = buf.split("").map(function (c) {
+        buffer = buf.split("")
+        .map(function (c) {
           return c.charCodeAt(0);
         });
 
@@ -85,7 +86,8 @@
     function resolveBag(bag, maybeName) {
       if (typeof maybeName === "string" || maybeName instanceof String) {
         return openBag(bag, maybeName);
-      } else {
+      }
+      else {
         return maybeName;
       }
     }
@@ -149,7 +151,8 @@
       // Find out where we're going to store the object in the metadata database and where in the parent object we're going to store the documentation object.
       var parentBag = fillBag(info.parent || ""),
         pluralName = fieldType + "s";
-      pluralName = pluralName.replace(/ys$/, "ies").replace(/ss$/, "ses");
+      pluralName = pluralName.replace(/ys$/, "ies")
+        .replace(/ss$/, "ses");
       if (!parentBag[pluralName]) {
         parentBag[pluralName] = [];
       }
@@ -247,9 +250,11 @@
                   // can dot-access them. I'm using the typical C++ notation for member
                   // fields here.
                   output += "::";
-                } else if (this.fieldType === "example" || this.fieldType === "issue") {
+                }
+                else if (this.fieldType === "example" || this.fieldType === "issue") {
                   output += ": ";
-                } else {
+                }
+                else {
                   output += ".";
                 }
               }
@@ -263,7 +268,8 @@
         if (!bag.id) {
           Object.defineProperty(bag, "id", {
             get: function get() {
-              return this.fullName.replace(/(\.|:)/g, "_").replace(/ /g, "");
+              return this.fullName.replace(/(\.|:)/g, "_")
+                .replace(/ /g, "");
             }
           });
         }
@@ -380,7 +386,8 @@
           // so no need to go any further than this.
           if (c === '(' || c === '{' || c === '[') {
             ++scopeLevel;
-          } else if (c === ')' || c === '}' || c === ']') {
+          }
+          else if (c === ')' || c === '}' || c === ']') {
             --scopeLevel;
           }
         }
@@ -391,7 +398,8 @@
           // ... save the parameter, skipping the first character because it's always
           // either the open paren for the parameter list or one of the commas
           // between parameters.
-          parameters.push(parseParameter(script.substring(start + 1, i).trim()));
+          parameters.push(parseParameter(script.substring(start + 1, i)
+            .trim()));
 
           // Advance forward the start of the next token.
           start = i;
@@ -431,7 +439,12 @@
       var litReplace = function litReplace(str) {
         var name = "&STRING_LIT" + stringLiterals.length + ";";
         if (str[0] === "'") {
-          str = str.replace(/\\"/g, "&_DBLQUOTE_;").replace(/\\'/g, "&_SGLQUOTE_;").replace(/"/g, "\\\"").replace(/'/g, "\"").replace(/&_DBLQUOTE_;/g, "\\\"").replace(/&_SGLQUOTE_;/g, "\\'");
+          str = str.replace(/\\"/g, "&_DBLQUOTE_;")
+            .replace(/\\'/g, "&_SGLQUOTE_;")
+            .replace(/"/g, "\\\"")
+            .replace(/'/g, "\"")
+            .replace(/&_DBLQUOTE_;/g, "\\\"")
+            .replace(/&_SGLQUOTE_;/g, "\\'");
         }
         stringLiterals.push(str);
         return name;
@@ -439,7 +452,12 @@
       var litReturn = function litReturn(a, b) {
         return stringLiterals[b];
       };
-      var param = script.replace(/'(\\'|[^'])+'/g, litReplace).replace(/"(\\"|[^"])+"/g, litReplace).replace(/\b(\w+)\b\s*:/g, "\"$1\":").replace(/&STRING_LIT(\d+);/g, litReturn).replace(/&STRING_LIT(\d+);/g, litReturn).replace(/\\\r?\n/g, "");
+      var param = script.replace(/'(\\'|[^'])+'/g, litReplace)
+        .replace(/"(\\"|[^"])+"/g, litReplace)
+        .replace(/\b(\w+)\b\s*:/g, "\"$1\":")
+        .replace(/&STRING_LIT(\d+);/g, litReturn)
+        .replace(/&STRING_LIT(\d+);/g, litReturn)
+        .replace(/\\\r?\n/g, "");
       return JSON.parse(param);
     }
 
@@ -454,7 +472,8 @@
         var obj = null;
         if (typeof name === "string" || name instanceof String) {
           obj = openBag(database, name);
-        } else {
+        }
+        else {
           obj = name;
         }
         if (obj) {
@@ -494,15 +513,21 @@
         var output = "";
         if (obj.fieldType === "enumeration" && propertyName === "values") {
           output += this.formatEnumeration(obj, propertyName, value);
-        } else if (value instanceof Array) {
+        }
+        else if (value instanceof Array) {
           output += this.formatArray(obj, propertyName, value);
-        } else if (propertyName === "parent") {
-          output += "<p>Contained in <a href=\"index.html#" + pliny.get(value).id + "\"><code>" + value + "</code></a></p>";
-        } else if (propertyName === "description") {
+        }
+        else if (propertyName === "parent") {
+          output += "<p>Contained in <a href=\"index.html#" + pliny.get(value)
+            .id + "\"><code>" + value + "</code></a></p>";
+        }
+        else if (propertyName === "description") {
           output += markdown(value);
-        } else if (propertyName === "returns") {
+        }
+        else if (propertyName === "returns") {
           output += "<h3>Return value</h3>" + markdown(value);
-        } else {
+        }
+        else {
           output += "<dl><dt>" + propertyName + "</dt><dd>" + value + "</dd></dl>";
         }
         return output;
@@ -542,7 +567,10 @@
       // @param {Array} arr - an array of objects defining issues.
       // @return {String} - a summary/details view of the issues.
       issuesFormat: function issuesFormat(obj, arr) {
-        var parts = { open: "", closed: "" };
+        var parts = {
+          open: "",
+          closed: ""
+        };
         for (var i = 0; i < arr.length; ++i) {
           var issue = arr[i],
             str = "<div><h3><a href=\"index.html#" + issue.id + "\">" + issue.issueID + ": " + issue.name + " [" + issue.type + "]</a></h3>" + markdown(issue.description) + "</div>";
@@ -581,7 +609,8 @@
         if (obj.fieldType === "class") {
           if (arrName === "parameters") {
             output += "constructor ";
-          } else if (arrName === "functions") {
+          }
+          else if (arrName === "functions") {
             output += "static ";
           }
         }
@@ -595,8 +624,10 @@
         var formatterName = arrName + "Format";
         if (this[formatterName]) {
           output += this[formatterName](obj, arr);
-        } else {
-          output += "<ul class=\"" + arrName + "\">" + arr.map(this.formatArrayElement.bind(this, arrName)).join("") + "</ul>";
+        }
+        else {
+          output += "<ul class=\"" + arrName + "\">" + arr.map(this.formatArrayElement.bind(this, arrName))
+            .join("") + "</ul>";
         }
         return output;
       },
@@ -616,7 +647,8 @@
           var desc = n.description.match(/^(([^\n](\n[^\n])?)+)\n\n/);
           if (desc) {
             desc = desc[1] + "...";
-          } else {
+          }
+          else {
             desc = n.description;
           }
 
@@ -625,11 +657,12 @@
           }
 
           if (n.default !== undefined) {
-            desc += " Defaults to <code>" + n.default + "</code>.";
+            desc += " Defaults to <code>" + n.default+"</code>.";
           }
 
           s += "<dl><dt>" + this.shortDescription(false, n) + "</dt><dd>" + markdown(desc) + "</dd></dl>";
-        } else {
+        }
+        else {
           s += this.shortDescription(false, n);
         }
         s += "</li>";
@@ -662,8 +695,9 @@
           output += "<ol class=\"signatureParameters\">";
           if (p.parameters) {
             output += "<li>" + p.parameters.map(function (p) {
-              return p.name;
-            }).join("</li><li>") + "</li>";
+                return p.name;
+              })
+              .join("</li><li>") + "</li>";
           }
           output += "</ol>";
         }
@@ -692,9 +726,11 @@
       formatField: function formatField(obj, propertyName, value) {
         if (value instanceof Array) {
           return this.formatArray(obj, propertyName, value);
-        } else if (propertyName === "description") {
+        }
+        else if (propertyName === "description") {
           return "\t" + value + "\n";
-        } else {
+        }
+        else {
           return "\t" + propertyName + ": " + value + "\n";
         }
       },
@@ -711,7 +747,8 @@
         if (obj.fieldType === "class") {
           if (arrName === "parameters") {
             output += "constructor ";
-          } else if (arrName === "functions") {
+          }
+          else if (arrName === "functions") {
             output += "static ";
           }
         }
@@ -721,8 +758,10 @@
         }
 
         if (arr instanceof Array) {
-          output += arr.map(this.formatArrayElement.bind(this, arrName)).join("");
-        } else {
+          output += arr.map(this.formatArrayElement.bind(this, arrName))
+            .join("");
+        }
+        else {
           output += arr;
         }
         return output;
@@ -768,7 +807,8 @@
         if (p.fieldType === "function" || p.fieldType === "method") {
           output += "(";
           if (p.parameters) {
-            output += p.parameters.map(this.shortDescription.bind(this, false)).join(", ");
+            output += p.parameters.map(this.shortDescription.bind(this, false))
+              .join(", ");
           }
           output += ")";
         }
@@ -808,7 +848,8 @@
               if (txt[left] === "(") {
                 found = true;
                 ++depth;
-              } else if (txt[left] === ")")--depth;
+              }
+              else if (txt[left] === ")") --depth;
             }
             if (depth === 0 && found) break;
           }
@@ -842,5 +883,5 @@
       }
     });
     return module;
-  } (), typeof module !== 'undefined' && require || openBag.bind(null, window));
+  }(), typeof module !== 'undefined' && require || openBag.bind(null, window));
 })();
