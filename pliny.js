@@ -1,7 +1,3 @@
-"use strict";
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-
 /**
  * marked - a markdown parser
  * Copyright (c) 2011-2014, Christopher Jeffrey. (MIT Licensed)
@@ -51,39 +47,35 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     this.rules = block.normal;
     if (this.options.gfm) {
       if (this.options.tables) {
-        this.rules = block.tables;
-      } else {
-        this.rules = block.gfm;
+        this.rules = block.tables
+      }
+      else {
+        this.rules = block.gfm
       }
     }
   }
   Lexer.rules = block;
   Lexer.lex = function (src, options) {
     var lexer = new Lexer(options);
-    return lexer.lex(src);
+    return lexer.lex(src)
   };
   Lexer.prototype.lex = function (src) {
-    src = src.replace(/\r\n|\r/g, "\n").replace(/\t/g, "    ").replace(/\u00a0/g, " ").replace(/\u2424/g, "\n");
-    return this.token(src, true);
+    src = src.replace(/\r\n|\r/g, "\n")
+      .replace(/\t/g, "    ")
+      .replace(/\u00a0/g, " ")
+      .replace(/\u2424/g, "\n");
+    return this.token(src, true)
   };
   Lexer.prototype.token = function (src, top, bq) {
     var src = src.replace(/^ +$/gm, ""),
-        next,
-        loose,
-        cap,
-        bull,
-        b,
-        item,
-        space,
-        i,
-        l;
+      next, loose, cap, bull, b, item, space, i, l;
     while (src) {
       if (cap = this.rules.newline.exec(src)) {
         src = src.substring(cap[0].length);
         if (cap[0].length > 1) {
           this.tokens.push({
             type: "space"
-          });
+          })
         }
       }
       if (cap = this.rules.code.exec(src)) {
@@ -93,7 +85,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           type: "code",
           text: !this.options.pedantic ? cap.replace(/\n+$/, "") : cap
         });
-        continue;
+        continue
       }
       if (cap = this.rules.fences.exec(src)) {
         src = src.substring(cap[0].length);
@@ -102,7 +94,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           lang: cap[2],
           text: cap[3] || ""
         });
-        continue;
+        continue
       }
       if (cap = this.rules.heading.exec(src)) {
         src = src.substring(cap[0].length);
@@ -111,32 +103,38 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           depth: cap[1].length,
           text: cap[2]
         });
-        continue;
+        continue
       }
       if (top && (cap = this.rules.nptable.exec(src))) {
         src = src.substring(cap[0].length);
         item = {
           type: "table",
-          header: cap[1].replace(/^ *| *\| *$/g, "").split(/ *\| */),
-          align: cap[2].replace(/^ *|\| *$/g, "").split(/ *\| */),
-          cells: cap[3].replace(/\n$/, "").split("\n")
+          header: cap[1].replace(/^ *| *\| *$/g, "")
+            .split(/ *\| */),
+          align: cap[2].replace(/^ *|\| *$/g, "")
+            .split(/ *\| */),
+          cells: cap[3].replace(/\n$/, "")
+            .split("\n")
         };
         for (i = 0; i < item.align.length; i++) {
           if (/^ *-+: *$/.test(item.align[i])) {
-            item.align[i] = "right";
-          } else if (/^ *:-+: *$/.test(item.align[i])) {
-            item.align[i] = "center";
-          } else if (/^ *:-+ *$/.test(item.align[i])) {
-            item.align[i] = "left";
-          } else {
-            item.align[i] = null;
+            item.align[i] = "right"
+          }
+          else if (/^ *:-+: *$/.test(item.align[i])) {
+            item.align[i] = "center"
+          }
+          else if (/^ *:-+ *$/.test(item.align[i])) {
+            item.align[i] = "left"
+          }
+          else {
+            item.align[i] = null
           }
         }
         for (i = 0; i < item.cells.length; i++) {
-          item.cells[i] = item.cells[i].split(/ *\| */);
+          item.cells[i] = item.cells[i].split(/ *\| */)
         }
         this.tokens.push(item);
-        continue;
+        continue
       }
       if (cap = this.rules.lheading.exec(src)) {
         src = src.substring(cap[0].length);
@@ -145,14 +143,14 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           depth: cap[2] === "=" ? 1 : 2,
           text: cap[1]
         });
-        continue;
+        continue
       }
       if (cap = this.rules.hr.exec(src)) {
         src = src.substring(cap[0].length);
         this.tokens.push({
           type: "hr"
         });
-        continue;
+        continue
       }
       if (cap = this.rules.blockquote.exec(src)) {
         src = src.substring(cap[0].length);
@@ -164,7 +162,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         this.tokens.push({
           type: "blockquote_end"
         });
-        continue;
+        continue
       }
       if (cap = this.rules.list.exec(src)) {
         src = src.substring(cap[0].length);
@@ -183,19 +181,20 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           item = item.replace(/^ *([*+-]|\d+\.) +/, "");
           if (~item.indexOf("\n ")) {
             space -= item.length;
-            item = !this.options.pedantic ? item.replace(new RegExp("^ {1," + space + "}", "gm"), "") : item.replace(/^ {1,4}/gm, "");
+            item = !this.options.pedantic ? item.replace(new RegExp("^ {1," + space + "}", "gm"), "") : item.replace(/^ {1,4}/gm, "")
           }
           if (this.options.smartLists && i !== l - 1) {
             b = block.bullet.exec(cap[i + 1])[0];
             if (bull !== b && !(bull.length > 1 && b.length > 1)) {
-              src = cap.slice(i + 1).join("\n") + src;
-              i = l - 1;
+              src = cap.slice(i + 1)
+                .join("\n") + src;
+              i = l - 1
             }
           }
           loose = next || /\n\n(?!\s*$)/.test(item);
           if (i !== l - 1) {
             next = item.charAt(item.length - 1) === "\n";
-            if (!loose) loose = next;
+            if (!loose) loose = next
           }
           this.tokens.push({
             type: loose ? "loose_item_start" : "list_item_start"
@@ -203,12 +202,12 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           this.token(item, false, bq);
           this.tokens.push({
             type: "list_item_end"
-          });
+          })
         }
         this.tokens.push({
           type: "list_end"
         });
-        continue;
+        continue
       }
       if (cap = this.rules.html.exec(src)) {
         src = src.substring(cap[0].length);
@@ -217,7 +216,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           pre: !this.options.sanitizer && (cap[1] === "pre" || cap[1] === "script" || cap[1] === "style"),
           text: cap[0]
         });
-        continue;
+        continue
       }
       if (!bq && top && (cap = this.rules.def.exec(src))) {
         src = src.substring(cap[0].length);
@@ -225,32 +224,39 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           href: cap[2],
           title: cap[3]
         };
-        continue;
+        continue
       }
       if (top && (cap = this.rules.table.exec(src))) {
         src = src.substring(cap[0].length);
         item = {
           type: "table",
-          header: cap[1].replace(/^ *| *\| *$/g, "").split(/ *\| */),
-          align: cap[2].replace(/^ *|\| *$/g, "").split(/ *\| */),
-          cells: cap[3].replace(/(?: *\| *)?\n$/, "").split("\n")
+          header: cap[1].replace(/^ *| *\| *$/g, "")
+            .split(/ *\| */),
+          align: cap[2].replace(/^ *|\| *$/g, "")
+            .split(/ *\| */),
+          cells: cap[3].replace(/(?: *\| *)?\n$/, "")
+            .split("\n")
         };
         for (i = 0; i < item.align.length; i++) {
           if (/^ *-+: *$/.test(item.align[i])) {
-            item.align[i] = "right";
-          } else if (/^ *:-+: *$/.test(item.align[i])) {
-            item.align[i] = "center";
-          } else if (/^ *:-+ *$/.test(item.align[i])) {
-            item.align[i] = "left";
-          } else {
-            item.align[i] = null;
+            item.align[i] = "right"
+          }
+          else if (/^ *:-+: *$/.test(item.align[i])) {
+            item.align[i] = "center"
+          }
+          else if (/^ *:-+ *$/.test(item.align[i])) {
+            item.align[i] = "left"
+          }
+          else {
+            item.align[i] = null
           }
         }
         for (i = 0; i < item.cells.length; i++) {
-          item.cells[i] = item.cells[i].replace(/^ *\| *| *\| *$/g, "").split(/ *\| */);
+          item.cells[i] = item.cells[i].replace(/^ *\| *| *\| *$/g, "")
+            .split(/ *\| */)
         }
         this.tokens.push(item);
-        continue;
+        continue
       }
       if (top && (cap = this.rules.paragraph.exec(src))) {
         src = src.substring(cap[0].length);
@@ -258,7 +264,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           type: "paragraph",
           text: cap[1].charAt(cap[1].length - 1) === "\n" ? cap[1].slice(0, -1) : cap[1]
         });
-        continue;
+        continue
       }
       if (cap = this.rules.text.exec(src)) {
         src = src.substring(cap[0].length);
@@ -266,13 +272,13 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           type: "text",
           text: cap[0]
         });
-        continue;
+        continue
       }
       if (src) {
-        throw new Error("Infinite loop on byte: " + src.charCodeAt(0));
+        throw new Error("Infinite loop on byte: " + src.charCodeAt(0))
       }
     }
-    return this.tokens;
+    return this.tokens
   };
   var inline = {
     escape: /^\\([\\`*{}\[\]()#+\-.!_>])/,
@@ -313,66 +319,67 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     this.options = options || marked.defaults;
     this.links = links;
     this.rules = inline.normal;
-    this.renderer = this.options.renderer || new Renderer();
+    this.renderer = this.options.renderer || new Renderer;
     this.renderer.options = this.options;
     if (!this.links) {
-      throw new Error("Tokens array requires a `links` property.");
+      throw new Error("Tokens array requires a `links` property.")
     }
     if (this.options.gfm) {
       if (this.options.breaks) {
-        this.rules = inline.breaks;
-      } else {
-        this.rules = inline.gfm;
+        this.rules = inline.breaks
       }
-    } else if (this.options.pedantic) {
-      this.rules = inline.pedantic;
+      else {
+        this.rules = inline.gfm
+      }
+    }
+    else if (this.options.pedantic) {
+      this.rules = inline.pedantic
     }
   }
   InlineLexer.rules = inline;
   InlineLexer.output = function (src, links, options) {
     var inline = new InlineLexer(links, options);
-    return inline.output(src);
+    return inline.output(src)
   };
   InlineLexer.prototype.output = function (src) {
     var out = "",
-        link,
-        text,
-        href,
-        cap;
+      link, text, href, cap;
     while (src) {
       if (cap = this.rules.escape.exec(src)) {
         src = src.substring(cap[0].length);
         out += cap[1];
-        continue;
+        continue
       }
       if (cap = this.rules.autolink.exec(src)) {
         src = src.substring(cap[0].length);
         if (cap[2] === "@") {
           text = cap[1].charAt(6) === ":" ? this.mangle(cap[1].substring(7)) : this.mangle(cap[1]);
-          href = this.mangle("mailto:") + text;
-        } else {
+          href = this.mangle("mailto:") + text
+        }
+        else {
           text = escape(cap[1]);
-          href = text;
+          href = text
         }
         out += this.renderer.link(href, null, text);
-        continue;
+        continue
       }
       if (!this.inLink && (cap = this.rules.url.exec(src))) {
         src = src.substring(cap[0].length);
         text = escape(cap[1]);
         href = text;
         out += this.renderer.link(href, null, text);
-        continue;
+        continue
       }
       if (cap = this.rules.tag.exec(src)) {
         if (!this.inLink && /^<a /i.test(cap[0])) {
-          this.inLink = true;
-        } else if (this.inLink && /^<\/a>/i.test(cap[0])) {
-          this.inLink = false;
+          this.inLink = true
+        }
+        else if (this.inLink && /^<\/a>/i.test(cap[0])) {
+          this.inLink = false
         }
         src = src.substring(cap[0].length);
         out += this.options.sanitize ? this.options.sanitizer ? this.options.sanitizer(cap[0]) : escape(cap[0]) : cap[0];
-        continue;
+        continue
       }
       if (cap = this.rules.link.exec(src)) {
         src = src.substring(cap[0].length);
@@ -382,238 +389,247 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           title: cap[3]
         });
         this.inLink = false;
-        continue;
+        continue
       }
       if ((cap = this.rules.reflink.exec(src)) || (cap = this.rules.nolink.exec(src))) {
         src = src.substring(cap[0].length);
-        link = (cap[2] || cap[1]).replace(/\s+/g, " ");
+        link = (cap[2] || cap[1])
+          .replace(/\s+/g, " ");
         link = this.links[link.toLowerCase()];
         if (!link || !link.href) {
           out += cap[0].charAt(0);
           src = cap[0].substring(1) + src;
-          continue;
+          continue
         }
         this.inLink = true;
         out += this.outputLink(cap, link);
         this.inLink = false;
-        continue;
+        continue
       }
       if (cap = this.rules.strong.exec(src)) {
         src = src.substring(cap[0].length);
         out += this.renderer.strong(this.output(cap[2] || cap[1]));
-        continue;
+        continue
       }
       if (cap = this.rules.em.exec(src)) {
         src = src.substring(cap[0].length);
         out += this.renderer.em(this.output(cap[2] || cap[1]));
-        continue;
+        continue
       }
       if (cap = this.rules.code.exec(src)) {
         src = src.substring(cap[0].length);
         out += this.renderer.codespan(escape(cap[2], true));
-        continue;
+        continue
       }
       if (cap = this.rules.br.exec(src)) {
         src = src.substring(cap[0].length);
         out += this.renderer.br();
-        continue;
+        continue
       }
       if (cap = this.rules.del.exec(src)) {
         src = src.substring(cap[0].length);
         out += this.renderer.del(this.output(cap[1]));
-        continue;
+        continue
       }
       if (cap = this.rules.text.exec(src)) {
         src = src.substring(cap[0].length);
         out += this.renderer.text(escape(this.smartypants(cap[0])));
-        continue;
+        continue
       }
       if (src) {
-        throw new Error("Infinite loop on byte: " + src.charCodeAt(0));
+        throw new Error("Infinite loop on byte: " + src.charCodeAt(0))
       }
     }
-    return out;
+    return out
   };
   InlineLexer.prototype.outputLink = function (cap, link) {
     var href = escape(link.href),
-        title = link.title ? escape(link.title) : null;
-    return cap[0].charAt(0) !== "!" ? this.renderer.link(href, title, this.output(cap[1])) : this.renderer.image(href, title, escape(cap[1]));
+      title = link.title ? escape(link.title) : null;
+    return cap[0].charAt(0) !== "!" ? this.renderer.link(href, title, this.output(cap[1])) : this.renderer.image(href, title, escape(cap[1]))
   };
   InlineLexer.prototype.smartypants = function (text) {
     if (!this.options.smartypants) return text;
-    return text.replace(/---/g, "—").replace(/--/g, "–").replace(/(^|[-\u2014/(\[{"\s])'/g, "$1‘").replace(/'/g, "’").replace(/(^|[-\u2014/(\[{\u2018\s])"/g, "$1“").replace(/"/g, "”").replace(/\.{3}/g, "…");
+    return text.replace(/---/g, "—")
+      .replace(/--/g, "–")
+      .replace(/(^|[-\u2014/(\[{"\s])'/g, "$1‘")
+      .replace(/'/g, "’")
+      .replace(/(^|[-\u2014/(\[{\u2018\s])"/g, "$1“")
+      .replace(/"/g, "”")
+      .replace(/\.{3}/g, "…")
   };
   InlineLexer.prototype.mangle = function (text) {
     if (!this.options.mangle) return text;
     var out = "",
-        l = text.length,
-        i = 0,
-        ch;
+      l = text.length,
+      i = 0,
+      ch;
     for (; i < l; i++) {
       ch = text.charCodeAt(i);
       if (Math.random() > .5) {
-        ch = "x" + ch.toString(16);
+        ch = "x" + ch.toString(16)
       }
-      out += "&#" + ch + ";";
+      out += "&#" + ch + ";"
     }
-    return out;
+    return out
   };
 
   function Renderer(options) {
-    this.options = options || {};
+    this.options = options || {}
   }
   Renderer.prototype.code = function (code, lang, escaped) {
     if (this.options.highlight) {
       var out = this.options.highlight(code, lang);
       if (out != null && out !== code) {
         escaped = true;
-        code = out;
+        code = out
       }
     }
     if (!lang) {
-      return "<pre><code>" + (escaped ? code : escape(code, true)) + "\n</code></pre>";
+      return "<pre><code>" + (escaped ? code : escape(code, true)) + "\n</code></pre>"
     }
-    return '<pre><code class="' + this.options.langPrefix + escape(lang, true) + '">' + (escaped ? code : escape(code, true)) + "\n</code></pre>\n";
+    return '<pre><code class="' + this.options.langPrefix + escape(lang, true) + '">' + (escaped ? code : escape(code, true)) + "\n</code></pre>\n"
   };
   Renderer.prototype.blockquote = function (quote) {
-    return "<blockquote>\n" + quote + "</blockquote>\n";
+    return "<blockquote>\n" + quote + "</blockquote>\n"
   };
   Renderer.prototype.html = function (html) {
-    return html;
+    return html
   };
   Renderer.prototype.heading = function (text, level, raw) {
-    return "<h" + level + ' id="' + this.options.headerPrefix + raw.toLowerCase().replace(/[^\w]+/g, "-") + '">' + text + "</h" + level + ">\n";
+    return "<h" + level + ' id="' + this.options.headerPrefix + raw.toLowerCase()
+      .replace(/[^\w]+/g, "-") + '">' + text + "</h" + level + ">\n"
   };
   Renderer.prototype.hr = function () {
-    return this.options.xhtml ? "<hr/>\n" : "<hr>\n";
+    return this.options.xhtml ? "<hr/>\n" : "<hr>\n"
   };
   Renderer.prototype.list = function (body, ordered) {
     var type = ordered ? "ol" : "ul";
-    return "<" + type + ">\n" + body + "</" + type + ">\n";
+    return "<" + type + ">\n" + body + "</" + type + ">\n"
   };
   Renderer.prototype.listitem = function (text) {
-    return "<li>" + text + "</li>\n";
+    return "<li>" + text + "</li>\n"
   };
   Renderer.prototype.paragraph = function (text) {
-    return "<p>" + text + "</p>\n";
+    return "<p>" + text + "</p>\n"
   };
   Renderer.prototype.table = function (header, body) {
-    return "<table>\n" + "<thead>\n" + header + "</thead>\n" + "<tbody>\n" + body + "</tbody>\n" + "</table>\n";
+    return "<table>\n" + "<thead>\n" + header + "</thead>\n" + "<tbody>\n" + body + "</tbody>\n" + "</table>\n"
   };
   Renderer.prototype.tablerow = function (content) {
-    return "<tr>\n" + content + "</tr>\n";
+    return "<tr>\n" + content + "</tr>\n"
   };
   Renderer.prototype.tablecell = function (content, flags) {
     var type = flags.header ? "th" : "td";
     var tag = flags.align ? "<" + type + ' style="text-align:' + flags.align + '">' : "<" + type + ">";
-    return tag + content + "</" + type + ">\n";
+    return tag + content + "</" + type + ">\n"
   };
   Renderer.prototype.strong = function (text) {
-    return "<strong>" + text + "</strong>";
+    return "<strong>" + text + "</strong>"
   };
   Renderer.prototype.em = function (text) {
-    return "<em>" + text + "</em>";
+    return "<em>" + text + "</em>"
   };
   Renderer.prototype.codespan = function (text) {
-    return "<code>" + text + "</code>";
+    return "<code>" + text + "</code>"
   };
   Renderer.prototype.br = function () {
-    return this.options.xhtml ? "<br/>" : "<br>";
+    return this.options.xhtml ? "<br/>" : "<br>"
   };
   Renderer.prototype.del = function (text) {
-    return "<del>" + text + "</del>";
+    return "<del>" + text + "</del>"
   };
   Renderer.prototype.link = function (href, title, text) {
     if (this.options.sanitize) {
       try {
-        var prot = decodeURIComponent(unescape(href)).replace(/[^\w:]/g, "").toLowerCase();
-      } catch (e) {
-        return "";
+        var prot = decodeURIComponent(unescape(href))
+          .replace(/[^\w:]/g, "")
+          .toLowerCase()
+      }
+      catch (e) {
+        return ""
       }
       if (prot.indexOf("javascript:") === 0 || prot.indexOf("vbscript:") === 0) {
-        return "";
+        return ""
       }
     }
     var out = '<a href="' + href + '"';
     if (title) {
-      out += ' title="' + title + '"';
+      out += ' title="' + title + '"'
     }
     out += ">" + text + "</a>";
-    return out;
+    return out
   };
   Renderer.prototype.image = function (href, title, text) {
     var out = '<img src="' + href + '" alt="' + text + '"';
     if (title) {
-      out += ' title="' + title + '"';
+      out += ' title="' + title + '"'
     }
     out += this.options.xhtml ? "/>" : ">";
-    return out;
+    return out
   };
   Renderer.prototype.text = function (text) {
-    return text;
+    return text
   };
 
   function Parser(options) {
     this.tokens = [];
     this.token = null;
     this.options = options || marked.defaults;
-    this.options.renderer = this.options.renderer || new Renderer();
+    this.options.renderer = this.options.renderer || new Renderer;
     this.renderer = this.options.renderer;
-    this.renderer.options = this.options;
+    this.renderer.options = this.options
   }
   Parser.parse = function (src, options, renderer) {
     var parser = new Parser(options, renderer);
-    return parser.parse(src);
+    return parser.parse(src)
   };
   Parser.prototype.parse = function (src) {
     this.inline = new InlineLexer(src.links, this.options, this.renderer);
     this.tokens = src.reverse();
     var out = "";
     while (this.next()) {
-      out += this.tok();
+      out += this.tok()
     }
-    return out;
+    return out
   };
   Parser.prototype.next = function () {
-    return this.token = this.tokens.pop();
+    return this.token = this.tokens.pop()
   };
   Parser.prototype.peek = function () {
-    return this.tokens[this.tokens.length - 1] || 0;
+    return this.tokens[this.tokens.length - 1] || 0
   };
   Parser.prototype.parseText = function () {
     var body = this.token.text;
-    while (this.peek().type === "text") {
-      body += "\n" + this.next().text;
+    while (this.peek()
+      .type === "text") {
+      body += "\n" + this.next()
+        .text
     }
-    return this.inline.output(body);
+    return this.inline.output(body)
   };
   Parser.prototype.tok = function () {
     switch (this.token.type) {
       case "space":
         {
-          return "";
+          return ""
         }
       case "hr":
         {
-          return this.renderer.hr();
+          return this.renderer.hr()
         }
       case "heading":
         {
-          return this.renderer.heading(this.inline.output(this.token.text), this.token.depth, this.token.text);
+          return this.renderer.heading(this.inline.output(this.token.text), this.token.depth, this.token.text)
         }
       case "code":
         {
-          return this.renderer.code(this.token.text, this.token.lang, this.token.escaped);
+          return this.renderer.code(this.token.text, this.token.lang, this.token.escaped)
         }
       case "table":
         {
           var header = "",
-              body = "",
-              i,
-              row,
-              cell,
-              flags,
-              j;cell = "";
+            body = "",
+            i, row, cell, flags, j;cell = "";
           for (i = 0; i < this.token.header.length; i++) {
             flags = {
               header: true,
@@ -622,7 +638,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             cell += this.renderer.tablecell(this.inline.output(this.token.header[i]), {
               header: true,
               align: this.token.align[i]
-            });
+            })
           }
           header += this.renderer.tablerow(cell);
           for (i = 0; i < this.token.cells.length; i++) {
@@ -632,63 +648,71 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
               cell += this.renderer.tablecell(this.inline.output(row[j]), {
                 header: false,
                 align: this.token.align[j]
-              });
+              })
             }
-            body += this.renderer.tablerow(cell);
+            body += this.renderer.tablerow(cell)
           }
-          return this.renderer.table(header, body);
+          return this.renderer.table(header, body)
         }
       case "blockquote_start":
         {
           var body = "";
-          while (this.next().type !== "blockquote_end") {
-            body += this.tok();
+          while (this.next()
+            .type !== "blockquote_end") {
+            body += this.tok()
           }
-          return this.renderer.blockquote(body);
+          return this.renderer.blockquote(body)
         }
       case "list_start":
         {
           var body = "",
-              ordered = this.token.ordered;
-          while (this.next().type !== "list_end") {
-            body += this.tok();
+            ordered = this.token.ordered;
+          while (this.next()
+            .type !== "list_end") {
+            body += this.tok()
           }
-          return this.renderer.list(body, ordered);
+          return this.renderer.list(body, ordered)
         }
       case "list_item_start":
         {
           var body = "";
-          while (this.next().type !== "list_item_end") {
-            body += this.token.type === "text" ? this.parseText() : this.tok();
+          while (this.next()
+            .type !== "list_item_end") {
+            body += this.token.type === "text" ? this.parseText() : this.tok()
           }
-          return this.renderer.listitem(body);
+          return this.renderer.listitem(body)
         }
       case "loose_item_start":
         {
           var body = "";
-          while (this.next().type !== "list_item_end") {
-            body += this.tok();
+          while (this.next()
+            .type !== "list_item_end") {
+            body += this.tok()
           }
-          return this.renderer.listitem(body);
+          return this.renderer.listitem(body)
         }
       case "html":
         {
           var html = !this.token.pre && !this.options.pedantic ? this.inline.output(this.token.text) : this.token.text;
-          return this.renderer.html(html);
+          return this.renderer.html(html)
         }
       case "paragraph":
         {
-          return this.renderer.paragraph(this.inline.output(this.token.text));
+          return this.renderer.paragraph(this.inline.output(this.token.text))
         }
       case "text":
         {
-          return this.renderer.paragraph(this.parseText());
+          return this.renderer.paragraph(this.parseText())
         }
     }
   };
 
   function escape(html, encode) {
-    return html.replace(!encode ? /&(?!#?\w+;)/g : /&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    return html.replace(!encode ? /&(?!#?\w+;)/g : /&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;")
   }
 
   function unescape(html) {
@@ -696,10 +720,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       n = n.toLowerCase();
       if (n === "colon") return ":";
       if (n.charAt(0) === "#") {
-        return n.charAt(1) === "x" ? String.fromCharCode(parseInt(n.substring(2), 16)) : String.fromCharCode(+n.substring(1));
+        return n.charAt(1) === "x" ? String.fromCharCode(parseInt(n.substring(2), 16)) : String.fromCharCode(+n.substring(1))
       }
-      return "";
-    });
+      return ""
+    })
   }
 
   function replace(regex, opt) {
@@ -710,8 +734,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       val = val.source || val;
       val = val.replace(/(^|[^\[])\^/g, "$1");
       regex = regex.replace(name, val);
-      return self;
-    };
+      return self
+    }
   }
 
   function noop() {}
@@ -719,87 +743,88 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
   function merge(obj) {
     var i = 1,
-        target,
-        key;
+      target, key;
     for (; i < arguments.length; i++) {
       target = arguments[i];
       for (key in target) {
         if (Object.prototype.hasOwnProperty.call(target, key)) {
-          obj[key] = target[key];
+          obj[key] = target[key]
         }
       }
     }
-    return obj;
+    return obj
   }
 
   function marked(src, opt, callback) {
     if (callback || typeof opt === "function") {
       if (!callback) {
         callback = opt;
-        opt = null;
+        opt = null
       }
       opt = merge({}, marked.defaults, opt || {});
       var highlight = opt.highlight,
-          tokens,
-          pending,
-          i = 0;
+        tokens, pending, i = 0;
       try {
-        tokens = Lexer.lex(src, opt);
-      } catch (e) {
-        return callback(e);
+        tokens = Lexer.lex(src, opt)
+      }
+      catch (e) {
+        return callback(e)
       }
       pending = tokens.length;
-      var done = function done(err) {
+      var done = function (err) {
         if (err) {
           opt.highlight = highlight;
-          return callback(err);
+          return callback(err)
         }
         var out;
         try {
-          out = Parser.parse(tokens, opt);
-        } catch (e) {
-          err = e;
+          out = Parser.parse(tokens, opt)
+        }
+        catch (e) {
+          err = e
         }
         opt.highlight = highlight;
-        return err ? callback(err) : callback(null, out);
+        return err ? callback(err) : callback(null, out)
       };
       if (!highlight || highlight.length < 3) {
-        return done();
+        return done()
       }
       delete opt.highlight;
       if (!pending) return done();
       for (; i < tokens.length; i++) {
         (function (token) {
           if (token.type !== "code") {
-            return --pending || done();
+            return --pending || done()
           }
           return highlight(token.text, token.lang, function (err, code) {
             if (err) return done(err);
             if (code == null || code === token.text) {
-              return --pending || done();
+              return --pending || done()
             }
             token.text = code;
             token.escaped = true;
-            --pending || done();
-          });
-        })(tokens[i]);
+            --pending || done()
+          })
+        })(tokens[i])
       }
-      return;
+      return
     }
     try {
       if (opt) opt = merge({}, marked.defaults, opt);
-      return Parser.parse(Lexer.lex(src, opt), opt);
-    } catch (e) {
+      return Parser.parse(Lexer.lex(src, opt), opt)
+    }
+    catch (e) {
       e.message += "\nPlease report this to https://github.com/chjj/marked.";
-      if ((opt || marked.defaults).silent) {
-        return "<p>An error occured:</p><pre>" + escape(e.message + "", true) + "</pre>";
+      if ((opt || marked.defaults)
+        .silent) {
+        return "<p>An error occured:</p><pre>" + escape(e.message + "", true) + "</pre>"
       }
-      throw e;
+      throw e
     }
   }
   marked.options = marked.setOptions = function (opt) {
     merge(marked.defaults, opt);
-    return marked;
+    return marked
   };
   marked.defaults = {
     gfm: true,
@@ -815,7 +840,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     langPrefix: "lang-",
     smartypants: false,
     headerPrefix: "",
-    renderer: new Renderer(),
+    renderer: new Renderer,
     xhtml: false
   };
   marked.Parser = Parser;
@@ -826,17 +851,20 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
   marked.InlineLexer = InlineLexer;
   marked.inlineLexer = InlineLexer.output;
   marked.parse = marked;
-  if (typeof module !== "undefined" && (typeof exports === "undefined" ? "undefined" : _typeof(exports)) === "object") {
-    module.exports = marked;
-  } else if (typeof define === "function" && define.amd) {
-    define(function () {
-      return marked;
-    });
-  } else {
-    this.marked = marked;
+  if (typeof module !== "undefined" && typeof exports === "object") {
+    module.exports = marked
   }
-}).call(function () {
-  return this || (typeof window !== "undefined" ? window : global);
+  else if (typeof define === "function" && define.amd) {
+    define(function () {
+      return marked
+    })
+  }
+  else {
+    this.marked = marked
+  }
+})
+.call(function () {
+  return this || (typeof window !== "undefined" ? window : global)
 }());
 /*
  * Copyright (C) 2016 Sean T. McBeth
@@ -855,6 +883,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 // Pliny is a documentation construction system. You create live documentation
 // objects on code assets with pliny, then you read back those documentation objects
 // with pliny.
@@ -866,7 +895,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 // Vesuvius during the destruction of Pompeii. Also, his nephew Gaius Plinius Caecilius Secundus
 // (https://en.wikipedia.org/wiki/Pliny_the_Younger), through whom we know his uncle.
 "use strict";
-
 (function () {
 
   // Walks through dot-accessors to retrieve an object out of a root object.
@@ -877,11 +905,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
   function openBag(bag, name) {
     // Break up the object path
     return name.split(".")
-    // Recurse through objects until we either run out of objects or find the
-    // one we're looking for.
-    .reduce(function (obj, p) {
-      return obj[p];
-    }, bag);
+      // Recurse through objects until we either run out of objects or find the
+      // one we're looking for.
+      .reduce(function (obj, p) {
+        return obj[p];
+      }, bag);
   }
 
   (function (module, require) {
@@ -903,10 +931,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
     function hash(buf) {
       var s1 = 1,
-          s2 = 0,
-          buffer = buf.split("").map(function (c) {
-        return c.charCodeAt(0);
-      });
+        s2 = 0,
+        buffer = buf.split("")
+        .map(function (c) {
+          return c.charCodeAt(0);
+        });
 
       for (var n = 0; n < buffer.length; ++n) {
         s1 = (s1 + buffer[n]) % 32771;
@@ -925,7 +954,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     function resolveBag(bag, maybeName) {
       if (typeof maybeName === "string" || maybeName instanceof String) {
         return openBag(bag, maybeName);
-      } else {
+      }
+      else {
         return maybeName;
       }
     }
@@ -945,13 +975,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         // Break up the object path.
         var parts = name.split("."),
 
+          // We'll be rebuilding the path as we go, so we can name intermediate objects.
+          path = "",
 
-        // We'll be rebuilding the path as we go, so we can name intermediate objects.
-        path = "",
-
-
-        // The first time we extend the path, it doesn't get a period seperator.
-        sep = "";
+          // The first time we extend the path, it doesn't get a period seperator.
+          sep = "";
         // Walk through the object tree.
         for (var i = 0; i < parts.length; ++i) {
           // Fill in any missing objects.
@@ -990,8 +1018,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
       // Find out where we're going to store the object in the metadata database and where in the parent object we're going to store the documentation object.
       var parentBag = fillBag(info.parent || ""),
-          pluralName = fieldType + "s";
-      pluralName = pluralName.replace(/ys$/, "ies").replace(/ss$/, "ses");
+        pluralName = fieldType + "s";
+      pluralName = pluralName.replace(/ys$/, "ies")
+        .replace(/ss$/, "ses");
       if (!parentBag[pluralName]) {
         parentBag[pluralName] = [];
       }
@@ -1031,7 +1060,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
         for (var k in subArrays) {
           var subArr = subArrays[k],
-              type = k.substring(0, k.length - 1);
+            type = k.substring(0, k.length - 1);
           for (var i = 0; i < subArr.length; ++i) {
             if (subArr[i].parent === undefined) {
               subArr[i].parent = info.fullName.replace(/::/g, ".");
@@ -1052,7 +1081,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     ///
     function copyObjectMetadata(info) {
       var fullName = (info.parent && info.parent + "." || "") + info.name,
-          bag = fillBag(fullName);
+        bag = fillBag(fullName);
 
       // Make sure we aren't setting the data for a second time.
       if (!bag.fieldType) {
@@ -1089,9 +1118,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                   // can dot-access them. I'm using the typical C++ notation for member
                   // fields here.
                   output += "::";
-                } else if (this.fieldType === "example" || this.fieldType === "issue") {
+                }
+                else if (this.fieldType === "example" || this.fieldType === "issue") {
                   output += ": ";
-                } else {
+                }
+                else {
                   output += ".";
                 }
               }
@@ -1105,7 +1136,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         if (!bag.id) {
           Object.defineProperty(bag, "id", {
             get: function get() {
-              return this.fullName.replace(/(\.|:)/g, "_").replace(/ /g, "");
+              return this.fullName.replace(/(\.|:)/g, "_")
+                .replace(/ /g, "");
             }
           });
         }
@@ -1128,12 +1160,14 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       var enumeration = null;
       try {
         enumeration = require(name);
-      } catch (exp) {
+      }
+      catch (exp) {
         enumeration = null;
       }
       if (!enumeration) {
         setTimeout(setEnumerationValues, 1, name);
-      } else {
+      }
+      else {
         for (var key in enumeration) {
           var val = enumeration[key];
           if (enumeration.hasOwnProperty(key) && typeof val === "number") {
@@ -1166,11 +1200,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         // Look for contextual scripts
         if (typeof obj === "function") {
           var script = obj.toString(),
-              match = null;
+            match = null;
           while (!!(match = scriptPattern.exec(script))) {
             var fieldType = match[1],
-                start = match.index + match[0].length,
-                fieldInfo = getFieldInfo(script.substring(start));
+              start = match.index + match[0].length,
+              fieldInfo = getFieldInfo(script.substring(start));
             // Shove in the context.
             if (fieldInfo.parent === undefined) {
               fieldInfo.parent = name;
@@ -1194,10 +1228,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     ///
     function getFieldInfo(script) {
       var parameters = [],
-          start = 0,
-          scopeLevel = 0,
-          inString = false,
-          stringToken = null;
+        start = 0,
+        scopeLevel = 0,
+        inString = false,
+        stringToken = null;
 
       // Walk over the script...
       for (var i = 0; i < script.length; ++i) {
@@ -1220,7 +1254,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           // so no need to go any further than this.
           if (c === '(' || c === '{' || c === '[') {
             ++scopeLevel;
-          } else if (c === ')' || c === '}' || c === ']') {
+          }
+          else if (c === ')' || c === '}' || c === ']') {
             --scopeLevel;
           }
         }
@@ -1231,7 +1266,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           // ... save the parameter, skipping the first character because it's always
           // either the open paren for the parameter list or one of the commas
           // between parameters.
-          parameters.push(parseParameter(script.substring(start + 1, i).trim()));
+          parameters.push(parseParameter(script.substring(start + 1, i)
+            .trim()));
 
           // Advance forward the start of the next token.
           start = i;
@@ -1271,7 +1307,12 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       var litReplace = function litReplace(str) {
         var name = "&STRING_LIT" + stringLiterals.length + ";";
         if (str[0] === "'") {
-          str = str.replace(/\\"/g, "&_DBLQUOTE_;").replace(/\\'/g, "&_SGLQUOTE_;").replace(/"/g, "\\\"").replace(/'/g, "\"").replace(/&_DBLQUOTE_;/g, "\\\"").replace(/&_SGLQUOTE_;/g, "\\'");
+          str = str.replace(/\\"/g, "&_DBLQUOTE_;")
+            .replace(/\\'/g, "&_SGLQUOTE_;")
+            .replace(/"/g, "\\\"")
+            .replace(/'/g, "\"")
+            .replace(/&_DBLQUOTE_;/g, "\\\"")
+            .replace(/&_SGLQUOTE_;/g, "\\'");
         }
         stringLiterals.push(str);
         return name;
@@ -1279,7 +1320,12 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       var litReturn = function litReturn(a, b) {
         return stringLiterals[b];
       };
-      var param = script.replace(/'(\\'|[^'])+'/g, litReplace).replace(/"(\\"|[^"])+"/g, litReplace).replace(/\b(\w+)\b\s*:/g, "\"$1\":").replace(/&STRING_LIT(\d+);/g, litReturn).replace(/&STRING_LIT(\d+);/g, litReturn).replace(/\\\r?\n/g, "");
+      var param = script.replace(/'(\\'|[^'])+'/g, litReplace)
+        .replace(/"(\\"|[^"])+"/g, litReplace)
+        .replace(/\b(\w+)\b\s*:/g, "\"$1\":")
+        .replace(/&STRING_LIT(\d+);/g, litReturn)
+        .replace(/&STRING_LIT(\d+);/g, litReturn)
+        .replace(/\\\r?\n/g, "");
       return JSON.parse(param);
     }
 
@@ -1294,7 +1340,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         var obj = null;
         if (typeof name === "string" || name instanceof String) {
           obj = openBag(database, name);
-        } else {
+        }
+        else {
           obj = name;
         }
         if (obj) {
@@ -1302,10 +1349,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
           // The array defines the order in which they will appear.
           output += "\n\n" + ["parent", "description", "parameters", "returns", "errors", "namespaces", "classes", "functions", "values", "events", "properties", "methods", "enumerations", "records", "examples", "issues", "comments"].map(formatters.checkAndFormatField.bind(this, obj))
-          // filter out any lines that returned undefined because they didn't exist
-          .filter(identity)
-          // concate them all together
-          .join("\n");
+            // filter out any lines that returned undefined because they didn't exist
+            .filter(identity)
+            // concate them all together
+            .join("\n");
           return output;
         }
       },
@@ -1334,15 +1381,21 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         var output = "";
         if (obj.fieldType === "enumeration" && propertyName === "values") {
           output += this.formatEnumeration(obj, propertyName, value);
-        } else if (value instanceof Array) {
+        }
+        else if (value instanceof Array) {
           output += this.formatArray(obj, propertyName, value);
-        } else if (propertyName === "parent") {
-          output += "<p>Contained in <a href=\"index.html#" + pliny.get(value).id + "\"><code>" + value + "</code></a></p>";
-        } else if (propertyName === "description") {
+        }
+        else if (propertyName === "parent") {
+          output += "<p>Contained in <a href=\"index.html#" + pliny.get(value)
+            .id + "\"><code>" + value + "</code></a></p>";
+        }
+        else if (propertyName === "description") {
           output += markdown(value);
-        } else if (propertyName === "returns") {
+        }
+        else if (propertyName === "returns") {
           output += "<h3>Return value</h3>" + markdown(value);
-        } else {
+        }
+        else {
           output += "<dl><dt>" + propertyName + "</dt><dd>" + value + "</dd></dl>";
         }
         return output;
@@ -1388,7 +1441,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         };
         for (var i = 0; i < arr.length; ++i) {
           var issue = arr[i],
-              str = "<div><h3><a href=\"index.html#" + issue.id + "\">" + issue.issueID + ": " + issue.name + " [" + issue.type + "]</a></h3>" + markdown(issue.description) + "</div>";
+            str = "<div><h3><a href=\"index.html#" + issue.id + "\">" + issue.issueID + ": " + issue.name + " [" + issue.type + "]</a></h3>" + markdown(issue.description) + "</div>";
           parts[issue.type] += str;
         }
         return parts.open + "<h2>Closed Issues</h2>" + parts.closed;
@@ -1424,7 +1477,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         if (obj.fieldType === "class") {
           if (arrName === "parameters") {
             output += "constructor ";
-          } else if (arrName === "functions") {
+          }
+          else if (arrName === "functions") {
             output += "static ";
           }
         }
@@ -1438,8 +1492,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         var formatterName = arrName + "Format";
         if (this[formatterName]) {
           output += this[formatterName](obj, arr);
-        } else {
-          output += "<ul class=\"" + arrName + "\">" + arr.map(this.formatArrayElement.bind(this, arrName)).join("") + "</ul>";
+        }
+        else {
+          output += "<ul class=\"" + arrName + "\">" + arr.map(this.formatArrayElement.bind(this, arrName))
+            .join("") + "</ul>";
         }
         return output;
       },
@@ -1459,7 +1515,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           var desc = n.description.match(/^(([^\n](\n[^\n])?)+)\n\n/);
           if (desc) {
             desc = desc[1] + "...";
-          } else {
+          }
+          else {
             desc = n.description;
           }
 
@@ -1468,11 +1525,12 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           }
 
           if (n.default !== undefined) {
-            desc += " Defaults to <code>" + n.default + "</code>.";
+            desc += " Defaults to <code>" + n.default+"</code>.";
           }
 
           s += "<dl><dt>" + this.shortDescription(false, n) + "</dt><dd>" + markdown(desc) + "</dd></dl>";
-        } else {
+        }
+        else {
           s += this.shortDescription(false, n);
         }
         s += "</li>";
@@ -1485,9 +1543,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       ///
       shortDescription: function shortDescription(topLevel, p) {
         var output = "",
-            tag = topLevel ? "h1" : "span",
-            isFunction = p.fieldType === "function" || p.fieldType === "method" || p.fieldType === "event",
-            isContainer = isFunction || p.fieldType === "class" || p.fieldType === "namespace" || p.fieldType === "enumeration" || p.fieldType === "subClass" || p.fieldType === "record";
+          tag = topLevel ? "h1" : "span",
+          isFunction = p.fieldType === "function" || p.fieldType === "method" || p.fieldType === "event",
+          isContainer = isFunction || p.fieldType === "class" || p.fieldType === "namespace" || p.fieldType === "enumeration" || p.fieldType === "subClass" || p.fieldType === "record";
 
         output += "<" + tag + ">";
         if (isContainer && !topLevel) {
@@ -1505,8 +1563,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           output += "<ol class=\"signatureParameters\">";
           if (p.parameters) {
             output += "<li>" + p.parameters.map(function (p) {
-              return p.name;
-            }).join("</li><li>") + "</li>";
+                return p.name;
+              })
+              .join("</li><li>") + "</li>";
           }
           output += "</ol>";
         }
@@ -1535,9 +1594,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       formatField: function formatField(obj, propertyName, value) {
         if (value instanceof Array) {
           return this.formatArray(obj, propertyName, value);
-        } else if (propertyName === "description") {
+        }
+        else if (propertyName === "description") {
           return "\t" + value + "\n";
-        } else {
+        }
+        else {
           return "\t" + propertyName + ": " + value + "\n";
         }
       },
@@ -1554,7 +1615,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         if (obj.fieldType === "class") {
           if (arrName === "parameters") {
             output += "constructor ";
-          } else if (arrName === "functions") {
+          }
+          else if (arrName === "functions") {
             output += "static ";
           }
         }
@@ -1564,8 +1626,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         }
 
         if (arr instanceof Array) {
-          output += arr.map(this.formatArrayElement.bind(this, arrName)).join("");
-        } else {
+          output += arr.map(this.formatArrayElement.bind(this, arrName))
+            .join("");
+        }
+        else {
           output += arr;
         }
         return output;
@@ -1611,7 +1675,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         if (p.fieldType === "function" || p.fieldType === "method") {
           output += "(";
           if (p.parameters) {
-            output += p.parameters.map(this.shortDescription.bind(this, false)).join(", ");
+            output += p.parameters.map(this.shortDescription.bind(this, false))
+              .join(", ");
           }
           output += ")";
         }
@@ -1635,23 +1700,24 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       var fs = require("fs");
       fs.readFile(source, "utf-8", function (err, txt) {
         var matches,
-            left = 0,
-            outputLeft = "",
-            outputRight = "",
-            test = /pliny\.\w+/g;
+          left = 0,
+          outputLeft = "",
+          outputRight = "",
+          test = /pliny\.\w+/g;
         while (matches = test.exec(txt)) {
           var sub = txt.substring(left, matches.index);
           outputLeft += sub;
           var depth = 0,
-              inString = false,
-              found = false;
+            inString = false,
+            found = false;
           for (left = matches.index + matches.length; left < txt.length; ++left) {
             if (txt[left] === "\"" && (left === 0 || txt[left - 1] !== "\\")) inString = !inString;
             if (!inString) {
               if (txt[left] === "(") {
                 found = true;
                 ++depth;
-              } else if (txt[left] === ")") --depth;
+              }
+              else if (txt[left] === ")") --depth;
             }
             if (depth === 0 && found) break;
           }
