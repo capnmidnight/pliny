@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Test logger</title>
+    <script type="text/javascript" src="pliny.js"></script>
+  </head>
+  <body>
+    <pre>
+    </pre>
+  </body>
+  <script type="text/javascript">
+    var pre = document.querySelector("pre");
+    pliny.function({
+      parent: "Hello",
+      name: "World",
+      returns: "nothing",
+      description: "Jello is good",
+      parameters: [{
+        name: "A",
+        type: "Number",
+        description: "A number",
+        optional: true,
+        defaultValue: 17
+      },{
+        name: "B",
+        type: "Number",
+        description: "Another number",
+        optional: true,
+        defaultValue: 19
+      }]
+    });
+
+    pre.appendChild(document.createTextNode(pliny("Hello.World")));
+  </script>
+</html>
