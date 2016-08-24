@@ -52,7 +52,7 @@
     }, bag);
   }
 
-  var pliny = function (require) {
+  var pliny = function (require, module) {
     "use strict";
 
     var markdown = require("marked");
@@ -839,8 +839,12 @@
       pliny[k] = pliny[k] || analyzeObject.bind(null, k);
     });
 
+    if (module) {
+      module.exports = pliny;
+    }
+
     return pliny;
-  }(typeof require !== 'undefined' && require || openBag.bind(null, window));
+  }(typeof require !== 'undefined' && require || openBag.bind(null, window), typeof module !== "undefined" && module);
   // end D:\Documents\VR\pliny\src\pliny.js
   ////////////////////////////////////////////////////////////////////////////////
   if (typeof window !== "undefined") window.pliny = pliny;

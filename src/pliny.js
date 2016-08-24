@@ -50,7 +50,7 @@ function openBag(bag, name) {
     }, bag);
 }
 
-var pliny = (function (require) {
+var pliny = (function (require, module) {
   "use strict";
 
   var markdown = require("marked");
@@ -875,5 +875,9 @@ var pliny = (function (require) {
     pliny[k] = pliny[k] || analyzeObject.bind(null, k);
   });
 
+  if(module){
+    module.exports = pliny;
+  }
+
   return pliny;
-})(typeof require !== 'undefined' && require || openBag.bind(null, window));
+})(typeof require !== 'undefined' && require || openBag.bind(null, window), typeof module !== "undefined" && module);
