@@ -1,5 +1,5 @@
 ﻿var gulp = require("gulp"),
-  nt = require("../notiontheory-basic-build/src").setup(gulp),
+  nt = require("notiontheory-basic-build").setup(gulp),
   js = nt.js("pliny-lib", "src", ["format"]),
   cat = nt.cat("pliny", ["node_modules/marked/lib/marked.js", "pliny-lib.js"], [js.build]);
 

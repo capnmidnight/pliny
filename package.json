@@ -22,6 +22,6 @@
   ],
   "devDependencies": {
     "marked": "^0.3.5",
-    "notiontheory-basic-build": "^2.0.11"
+    "notiontheory-basic-build": "^2.2.0"
   }
 }
