@@ -144,6 +144,7 @@ var pliny = (function (require) {
   // @param {String} info - the metadata object the user provided us.
   ///
   function analyzeObject(fieldType, info) {
+    var i;
     // If the user didn't supply a type for the metadata object, we infer it
     // from context.
     if (typeof info.fieldType === 'undefined') {
@@ -162,7 +163,7 @@ var pliny = (function (require) {
 
     // Make sure we haven't already stored an object by this name.
     var found = false;
-    for (var i = 0; i < arr.length; ++i) {
+    for (i = 0; i < arr.length; ++i) {
       if (arr[i].name === info.name) {
         found = true;
       }
@@ -195,7 +196,7 @@ var pliny = (function (require) {
       for (var k in subArrays) {
         var subArr = subArrays[k],
           type = k.substring(0, k.length - 1);
-        for (var i = 0; i < subArr.length; ++i) {
+        for (i = 0; i < subArr.length; ++i) {
           if (subArr[i].parent === undefined) {
             subArr[i].parent = info.fullName.replace(/::/g, ".");
           }
@@ -315,7 +316,7 @@ var pliny = (function (require) {
         }
       }
     }
-  };
+  }
 
   var scriptPattern = /\bpliny\s*\.\s*(\w+)/gm;
   /////
@@ -830,15 +831,15 @@ var pliny = (function (require) {
   // Forward on the markdown functionality
   pliny.markdown = markdown;
   // Strip pliny calls out of a source file and deposit them into a separate file.
-  pliny.carve = function (source, destination, callback) {
+  pliny.carve = function (source, libFile, docFile, callback) {
     var fs = require("fs");
     fs.readFile(source, "utf-8", function (err, txt) {
-      var matches,
+      var test = /pliny\.\w+/g,
         left = 0,
         outputLeft = "",
         outputRight = "",
-        test = /pliny\.\w+/g;
-      while (matches = test.exec(txt)) {
+        matches = test.exec(txt);
+      while (matches) {
         var sub = txt.substring(left, matches.index);
         outputLeft += sub;
         var depth = 0,
@@ -860,10 +861,11 @@ var pliny = (function (require) {
         }
 
         outputRight += txt.substring(matches.index, left);
+        matches = test.exec(txt);
       }
       outputLeft += txt.substring(left);
-      fs.writeFile(source, outputLeft, function () {
-        fs.writeFile(destination, outputRight, callback);
+      fs.writeFile(libFile, outputLeft, function () {
+        fs.writeFile(docFile, outputRight, callback);
       });
     });
   };
@@ -874,4 +876,4 @@ var pliny = (function (require) {
   });
 
   return pliny;
-})(typeof require !== 'undefined' && require || openBag.bind(null, window))
+})(typeof require !== 'undefined' && require || openBag.bind(null, window));
