@@ -846,15 +846,21 @@ var pliny = (function (require, module) {
           inString = false,
           found = false;
         for (left = matches.index + matches.length; left < txt.length; ++left) {
-          if (txt[left] === "\"" && (left === 0 || txt[left - 1] !== "\\")) inString = !inString;
+          if (txt[left] === "\"" && (left === 0 || txt[left - 1] !== "\\")) {
+            inString = !inString;
+          }
           if (!inString) {
             if (txt[left] === "(") {
               found = true;
               ++depth;
             }
-            else if (txt[left] === ")") --depth;
+            else if (txt[left] === ")") {
+              --depth;
+            }
           }
-          if (depth === 0 && found) break;
+          if (depth === 0 && found) {
+            break;
+          }
         }
         while (left < txt.length && /[;\) \r\n]/.test(txt[left])) {
           left++;
@@ -875,7 +881,7 @@ var pliny = (function (require, module) {
     pliny[k] = pliny[k] || analyzeObject.bind(null, k);
   });
 
-  if(module){
+  if(module) {
     module.exports = pliny;
   }
 
