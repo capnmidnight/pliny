@@ -854,4 +854,4 @@ var pliny = function (require, module) {
 })();
     // end D:\Documents\VR\pliny\src\pliny.js
     ////////////////////////////////////////////////////////////////////////////////
-console.info("pliny v3.3.3. see https://github.com/capnmidnight/pliny for more information.");
+console.info("pliny v3.3.4. see https://github.com/capnmidnight/pliny for more information.");
