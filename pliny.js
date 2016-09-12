@@ -1286,7 +1286,7 @@ if (typeof module !== 'undefined' && typeof exports === 'object') {
 }());
 
 ////////////////////////////////////////////////////////////////////////////////
-    // start C:\Users\ThinkPad\Documents\VR\pliny\src\pliny.js
+    // start D:\Documents\VR\pliny\src\pliny.js
 (function(){"use strict";
 
 /*
@@ -1310,6 +1310,7 @@ if (typeof module !== 'undefined' && typeof exports === 'object') {
 // Pliny's author is not smart enough to figure out how to make it        //
 // possible to use it to document itself, so here's a bunch of comments.  //
 ////////////////////////////////////////////////////////////////////////////
+
 
 // Pliny is a documentation construction system. You create live documentation
 // objects on code assets with pliny, then you read back those documentation objects
@@ -2138,6 +2139,6 @@ var pliny = function (require, module) {
 }(typeof require !== 'undefined' && require || openBag.bind(null, window), typeof module !== "undefined" && module);
     if(typeof window !== "undefined") window.pliny = pliny;
 })();
-    // end C:\Users\ThinkPad\Documents\VR\pliny\src\pliny.js
+    // end D:\Documents\VR\pliny\src\pliny.js
     ////////////////////////////////////////////////////////////////////////////////
-console.info("pliny v3.3.2. see http://www.primrosevr.com for more information.");
+console.info("pliny v3.3.3. see https://github.com/capnmidnight/pliny for more information.");
