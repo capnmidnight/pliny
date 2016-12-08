@@ -636,9 +636,7 @@ var pliny = (function (require, module) {
     },
     /////
     // For individual elements of an array, formats the element so it fits well
-    // on the screen. Elements that are supposed to be inline, but have the ability
-    // to be drilled-down into, are truncated if they get to be more than 200
-    // characters wide.
+    // on the screen.
     //
     // @param {String} arrName - the name of the array from which we retrieved elements.
     // @param {String} n - one of the array elements.
@@ -647,14 +645,7 @@ var pliny = (function (require, module) {
     formatArrayElement: function formatArrayElement(arrName, n) {
       var s = "<li>";
       if (n.description) {
-        var desc = n.description.match(/^(([^\n](\n[^\n])?)+)\n\n/);
-        if (desc) {
-          desc = desc[1] + "...";
-        }
-        else {
-          desc = n.description;
-        }
-
+        var desc = n.description;
         if (n.optional) {
           desc = "(Optional) " + desc;
         }
@@ -870,9 +861,12 @@ var pliny = (function (require, module) {
         matches = test.exec(txt);
       }
       outputLeft += txt.substring(left);
-      fs.writeFile(libFile, outputLeft, function () {
-        fs.writeFile(docFile, outputRight, callback);
-      });
+      if(docFile) {
+        callback = (function(cb) {
+          fs.writeFile(docFile, outputRight, cb);
+        }.bind(null, callback));
+      }
+      fs.writeFile(libFile, outputLeft, callback);
     });
   };
 
