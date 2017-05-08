@@ -1,10 +1,11 @@
 ﻿var gulp = require("gulp"),
   pkg = require("./package.json"),
-  build = require("notiontheory-basic-build"),
-  nt = build.setup(gulp, pkg),
-  js = nt.js("pliny-lib", "src", ["format"]),
-  cat = nt.cat("pliny", ["node_modules/marked/lib/marked.js", "pliny-lib.js"], [js]);
+  marigold = require("marigold-build").setup(gulp, pkg),
+  js = marigold.js({
+    entry: "src/index.js",
+    dependencies: ["format"],
+    moduleName: "pliny",
+    disableGenerators: true
+  });
 
-gulp.task("format", [js.format]);
-gulp.task("default", [js.default, cat.default]);
-gulp.task("release", [cat.release]);
+marigold.taskify([js], {});
