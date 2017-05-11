@@ -1339,34 +1339,21 @@ marked.parse = marked;
 // @param {String} name - a period-delimited list of object accessors, naming the object we want to access.
 // @returns {Object} - the object we asked for, or undefined, if it doesn't exist.
 function openBag(bag, name) {
-  // Break up the object path
-  return name.split(".")
-  // Recurse through objects until we either run out of objects or find the
-  // one we're looking for.
-  .reduce(function (obj, p) {
+  // Break up the object path, then recurse through objects until we either run
+  // out of objects or find the one we're looking for.
+  return name.split(".").reduce(function (obj, p) {
     return obj[p];
   }, bag);
 }
 
-// The default storage location.
-var database = {
-  fieldType: "database",
-  fullName: "[Global]",
-  id: "Global",
-  description: "These are the elements in the global namespace."
-};
-
 function hash(buf) {
   var s1 = 1,
-      s2 = 0,
-      buffer = buf.split("").map(function (c) {
-    return c.charCodeAt(0);
+      s2 = 0;
+  buf.split("").forEach(function (c) {
+    s1 = (s1 + c.charCodeAt(0)) % 32771;
+    s2 = (s2 + s1) % 32771;
   });
 
-  for (var n = 0; n < buffer.length; ++n) {
-    s1 = (s1 + buffer[n]) % 32771;
-    s2 = (s2 + s1) % 32771;
-  }
   return s2 << 8 | s1;
 }
 
@@ -1482,7 +1469,6 @@ function analyzeObject(fieldType, info) {
       if (info.parent === undefined) {
         info.parent = info.baseClass;
       }
-      pliny.subClass(info);
     }
 
     for (var k in subArrays) {
@@ -1592,15 +1578,7 @@ function setEnumerationValues(name) {
   } else {
     for (var key in enumeration) {
       var val = enumeration[key];
-      if (enumeration.hasOwnProperty(key) && typeof val === "number") {
-        pliny.value({
-          parent: name,
-          name: key,
-          type: "Number",
-          description: val.toString(),
-          value: val
-        });
-      }
+      if (enumeration.hasOwnProperty(key) && typeof val === "number") {}
     }
   }
 }
@@ -1705,14 +1683,6 @@ function getFieldInfo(script) {
   return parameters[0];
 }
 
-////
-// useful in cases where a functional system really just needs to check the
-// value of a collection.
-///
-function identity(v) {
-  return v;
-}
-
 /////
 // When we've found an individual parameter to a documentation function in a
 // contextual scope, we need to make sure it's valid JSON before we try to
@@ -1723,24 +1693,33 @@ function identity(v) {
 ///
 function parseParameter(script) {
   // Make sure all hash key labels are surrounded in quotation marks.
-  var stringLiterals = [];
-  var litReplace = function litReplace(str) {
+  var stringLiterals = [],
+      litReplace = function litReplace(str) {
     var name = "&STRING_LIT" + stringLiterals.length + ";";
     if (str[0] === "'") {
       str = str.replace(/\\"/g, "&_DBLQUOTE_;").replace(/\\'/g, "&_SGLQUOTE_;").replace(/"/g, "\\\"").replace(/'/g, "\"").replace(/&_DBLQUOTE_;/g, "\\\"").replace(/&_SGLQUOTE_;/g, "\\'");
     }
     stringLiterals.push(str);
     return name;
-  };
-  var litReturn = function litReturn(a, b) {
+  },
+      litReturn = function litReturn(a, b) {
     return stringLiterals[b];
-  };
-  var param = script.replace(/'(\\'|[^'])+'/g, litReplace).replace(/"(\\"|[^"])+"/g, litReplace).replace(/\b(\w+)\b\s*:/g, "\"$1\":").replace(/&STRING_LIT(\d+);/g, litReturn).replace(/&STRING_LIT(\d+);/g, litReturn).replace(/\\\r?\n/g, "");
+  },
+      param = script.replace(/'(\\'|[^'])+'/g, litReplace).replace(/"(\\"|[^"])+"/g, litReplace).replace(/\b(\w+)\b\s*:/g, "\"$1\":").replace(/&STRING_LIT(\d+);/g, litReturn).replace(/&STRING_LIT(\d+);/g, litReturn).replace(/\\\r?\n/g, "");
   return JSON.parse(param);
 }
 
-// A collection of different ways to output documentation data.
+var identity = function identity(v) {
+  return v;
+};
+var database = {
+  fieldType: "database",
+  fullName: "[Global]",
+  id: "Global",
+  description: "These are the elements in the global namespace."
+};
 var formatters = {
+
   /////
   // Find a particular object and print out the documentation for it.
   //
@@ -1762,6 +1741,7 @@ var formatters = {
       .filter(identity)
       // concate them all together
       .join("\n");
+
       return output;
     }
   },
@@ -1770,382 +1750,420 @@ var formatters = {
     if (obj2) {
       return this.formatField(obj, prop, obj2);
     }
-  }
-};
-// Make HTML that can be written out to a page
-formatters.html = {
-  format: function format(name) {
-    var obj = resolveBag(database, name);
-    return "<section id=\"" + obj.id + "\" class=\"" + obj.fieldType + "\"><article>" + formatters.format.call(formatters.html, obj) + "</article></section>";
   },
-  /////
-  // Puts together a string that describes a top-level field out of a documentation
-  // object.
-  //
-  // @param {Object} obj - the documentation object out of which we're retrieving the field.
-  // @param {String} p - the name of the field we're retrieving out of the documentation object.
-  // @return {String} - a description of the field.
-  ///
-  formatField: function formatField(obj, propertyName, value) {
-    var output = "";
-    if (obj.fieldType === "enumeration" && propertyName === "values") {
-      output += this.formatEnumeration(obj, propertyName, value);
-    } else if (value instanceof Array) {
-      output += this.formatArray(obj, propertyName, value);
-    } else if (propertyName === "parent") {
-      output += "<p>Contained in <a href=\"index.html#" + pliny.get(value).id + "\"><code>" + value + "</code></a></p>";
-    } else if (propertyName === "description") {
-      output += marked(value);
-    } else if (propertyName === "returns") {
-      output += "<h3>Return value</h3>" + marked(value);
-    } else {
-      output += "<dl><dt>" + propertyName + "</dt><dd>" + value + "</dd></dl>";
-    }
-    return output;
-  },
-  ////
-  // Specific fomratting function for Enumerations
-  //
-  // @param {Object} obj - the documentation object from which to read an array.
-  // @param {String} arrName - the name of the array to read from the documentation object.
-  // @param {Array} arr - the array from which we're reading values.
-  // @return {String} - the formatted description of the array.
-  formatEnumeration: function formatEnumeration(obj, arrName, arr) {
-    var output = "<table><thead><tr><th>Name</th><th>Value</th><tr><thead><tbody>";
-    for (var i = 0; i < arr.length; ++i) {
-      var e = arr[i];
-      output += "<tr><td>" + e.name + "</td><td>" + e.description + "</td></tr>";
-    }
-    output += "</tbody></table>";
-    return output;
-  },
-  ////
-  // Specific formatting function for Code Example.
-  //
-  // @param {Array} arr - an array of objects defining programming examples.
-  // @return {String} - a summary/details view of the programming examples.
-  examplesFormat: function examplesFormat(obj, arr) {
-    var output = "";
-    for (var i = 0; i < arr.length; ++i) {
-      var ex = arr[i];
-      output += "<div><h3><a href=\"index.html#" + ex.id + "\">" + ex.name + "</a></h3>" + marked(ex.description) + "</div>";
-    }
-    return output;
-  },
-  ////
-  // Specific formatting function for Issues.
-  //
-  // @param {Array} arr - an array of objects defining issues.
-  // @return {String} - a summary/details view of the issues.
-  issuesFormat: function issuesFormat(obj, arr) {
-    var parts = {
-      open: "",
-      closed: ""
-    };
-    for (var i = 0; i < arr.length; ++i) {
-      var issue = arr[i],
-          str = "<div><h3><a href=\"index.html#" + issue.id + "\">" + issue.issueID + ": " + issue.name + " [" + issue.type + "]</a></h3>" + marked(issue.description) + "</div>";
-      parts[issue.type] += str;
-    }
-    return parts.open + "<h2>Closed Issues</h2>" + parts.closed;
-  },
-  ////
-  // Specific formatting function for Comments section of Issues.
-  //
-  // @param {Array} arr - an array of objects defining comments.
-  // @return {String} - a summary/details view of the comment.
-  commentsFormat: function commentsFormat(obj, arr) {
-    var output = "";
-    for (var i = 0; i < arr.length; ++i) {
-      var comment = arr[i];
-      output += "<aside><h3>" + comment.name + "</h3>" + marked(comment.description);
-      if (typeof comment.comments !== "undefined" && comment.comments instanceof Array) {
-        output += this.formatArray(comment, "comments", comment.comments);
+
+
+  // Make HTML that can be written out to a page
+  html: {
+    format: function format(name) {
+      var obj = resolveBag(database, name);
+      return "<section id=\"" + obj.id + "\" class=\"" + obj.fieldType + "\"><article>" + formatters.format.call(formatters.html, obj) + "</article></section>";
+    },
+
+
+    /////
+    // Puts together a string that describes a top-level field out of a documentation
+    // object.
+    //
+    // @param {Object} obj - the documentation object out of which we're retrieving the field.
+    // @param {String} p - the name of the field we're retrieving out of the documentation object.
+    // @return {String} - a description of the field.
+    ///
+    formatField: function formatField(obj, propertyName, value) {
+      var output = "";
+      if (obj.fieldType === "enumeration" && propertyName === "values") {
+        output += this.formatEnumeration(obj, propertyName, value);
+      } else if (value instanceof Array) {
+        output += this.formatArray(obj, propertyName, value);
+      } else if (propertyName === "parent") {
+        var box = output += '<p>Contained in <a href="index.html#' + box.id + '"><code>' + value + '</code></a></p>';
+      } else if (propertyName === "description") {
+        output += marked(value);
+      } else if (propertyName === "returns") {
+        output += "<h3>Return value</h3>" + marked(value);
+      } else {
+        output += "<dl><dt>" + propertyName + "</dt><dd>" + value + "</dd></dl>";
       }
-      output += "</aside>";
-    }
-    return output;
-  },
-  /////
-  // Puts together lists of parameters for function signatures, as well as
-  // lists of properties and methods for classes and the like.
-  //
-  // @param {Object} obj - the documentation object from which to read an array.
-  // @param {String} arrName - the name of the array to read from the documentation object.
-  // @param {Array} arr - the array from which we're reading values.
-  // @return {String} - the formatted description of the array.
-  ///
-  formatArray: function formatArray(obj, arrName, arr) {
-    var output = "<h2>";
-    if (obj.fieldType === "class") {
-      if (arrName === "parameters") {
-        output += "constructor ";
-      } else if (arrName === "functions") {
-        output += "static ";
+      return output;
+    },
+
+
+    ////
+    // Specific fomratting function for Enumerations
+    //
+    // @param {Object} obj - the documentation object from which to read an array.
+    // @param {String} arrName - the name of the array to read from the documentation object.
+    // @param {Array} arr - the array from which we're reading values.
+    // @return {String} - the formatted description of the array.
+    formatEnumeration: function formatEnumeration(obj, arrName, arr) {
+      var output = "<table><thead><tr><th>Name</th><th>Value</th><tr><thead><tbody>";
+      for (var i = 0; i < arr.length; ++i) {
+        var e = arr[i];
+        output += "<tr><td>" + e.name + "</td><td>" + e.description + "</td></tr>";
       }
-    }
+      output += "</tbody></table>";
+      return output;
+    },
 
-    if (arrName !== "description") {
-      output += arrName;
-    }
 
-    output += "</h2>";
-
-    var formatterName = arrName + "Format";
-    if (this[formatterName]) {
-      output += this[formatterName](obj, arr);
-    } else {
-      output += "<ul class=\"" + arrName + "\">" + arr.map(this.formatArrayElement.bind(this, arrName)).join("") + "</ul>";
-    }
-    return output;
-  },
-  /////
-  // For individual elements of an array, formats the element so it fits well
-  // on the screen.
-  //
-  // @param {String} arrName - the name of the array from which we retrieved elements.
-  // @param {String} n - one of the array elements.
-  // @return {String} - the formatted element, including a newline at the end.
-  ///
-  formatArrayElement: function formatArrayElement(arrName, n) {
-    var s = "<li>";
-    if (n.description) {
-      var desc = n.description;
-      if (n.optional) {
-        desc = "(Optional) " + desc;
+    ////
+    // Specific formatting function for Code Example.
+    //
+    // @param {Array} arr - an array of objects defining programming examples.
+    // @return {String} - a summary/details view of the programming examples.
+    examplesFormat: function examplesFormat(obj, arr) {
+      var output = "";
+      for (var i = 0; i < arr.length; ++i) {
+        var ex = arr[i];
+        output += "<div><h3><a href=\"index.html#" + ex.id + "\">" + ex.name + "</a></h3>" + marked(ex.description) + "</div>";
       }
+      return output;
+    },
 
-      if (n.default !== undefined) {
-        desc += " Defaults to <code>" + n.default + "</code>.";
+
+    ////
+    // Specific formatting function for Issues.
+    //
+    // @param {Array} arr - an array of objects defining issues.
+    // @return {String} - a summary/details view of the issues.
+    issuesFormat: function issuesFormat(obj, arr) {
+      var parts = {
+        open: "",
+        closed: ""
+      };
+      for (var i = 0; i < arr.length; ++i) {
+        var issue = arr[i],
+            str = "<div><h3><a href=\"index.html#" + issue.id + "\">" + issue.issueID + ": " + issue.name + " [" + issue.type + "]</a></h3>" + marked(issue.description) + "</div>";
+        parts[issue.type] += str;
       }
+      return parts.open + "<h2>Closed Issues</h2>" + parts.closed;
+    },
 
-      s += "<dl><dt>" + this.shortDescription(false, n) + "</dt><dd>" + marked(desc) + "</dd></dl>";
-    } else {
-      s += this.shortDescription(false, n);
-    }
-    s += "</li>";
-    return s;
-  },
-  /////
-  // Describe an object by type, name, and parameters (if it's a function-type object).
-  // @param {Object} p - the documentation object to describe.
-  // @return {String} - the description of the documentation object.
-  ///
-  shortDescription: function shortDescription(topLevel, p) {
-    var output = "",
-        tag = topLevel ? "h1" : "span",
-        isFunction = p.fieldType === "function" || p.fieldType === "method" || p.fieldType === "event",
-        isContainer = isFunction || p.fieldType === "class" || p.fieldType === "namespace" || p.fieldType === "enumeration" || p.fieldType === "subClass" || p.fieldType === "record";
 
-    output += "<" + tag + ">";
-    if (isContainer && !topLevel) {
-      output += "<a href=\"index.html#" + p.id + "\">";
-    }
-
-    output += "<code>" + (topLevel && p.fieldType !== "example" && p.fullName || p.name);
-
-    if (p.type) {
-      output += " <span class=\"type\">" + p.type + "</span>";
-    }
-
-    // But functions and classes take parameters, so they get slightly more.
-    if (isFunction) {
-      output += "<ol class=\"signatureParameters\">";
-      if (p.parameters) {
-        output += "<li>" + p.parameters.map(function (p) {
-          return p.name;
-        }).join("</li><li>") + "</li>";
+    ////
+    // Specific formatting function for Comments section of Issues.
+    //
+    // @param {Array} arr - an array of objects defining comments.
+    // @return {String} - a summary/details view of the comment.
+    commentsFormat: function commentsFormat(obj, arr) {
+      var output = "";
+      for (var i = 0; i < arr.length; ++i) {
+        var comment = arr[i];
+        output += "<aside><h3>" + comment.name + "</h3>" + marked(comment.description);
+        if (typeof comment.comments !== "undefined" && comment.comments instanceof Array) {
+          output += this.formatArray(comment, "comments", comment.comments);
+        }
+        output += "</aside>";
       }
-      output += "</ol>";
-    }
+      return output;
+    },
 
-    if (isContainer && !topLevel) {
-      output += "</a>";
-    }
 
-    return output + "</code></" + tag + ">";
-  }
-};
-
-// Output to the Developer console in the browser directly.
-formatters.console = {
-  format: function format(name) {
-    return formatters.format.call(formatters.console, name);
-  },
-  /////
-  // Puts together a string that describes a top-level field out of a documentation
-  // object.
-  //
-  // @params {Object} obj - the documentation object out of which we're retrieving the field.
-  // @params {String} p - the name of the field we're retrieving out of the documentation object.
-  // @return {String} - a description of the field.
-  ///
-  formatField: function formatField(obj, propertyName, value) {
-    if (value instanceof Array) {
-      return this.formatArray(obj, propertyName, value);
-    } else if (propertyName === "description") {
-      return "\t" + value + "\n";
-    } else {
-      return "\t" + propertyName + ": " + value + "\n";
-    }
-  },
-  /////
-  // Puts together lists of parameters for function signatures, as well as
-  // lists of properties and methods for classes and the like.
-  //
-  // @param {Object} obj - the documentation object from which to read an array.
-  // @param {String} arrName - the name of the array to read from the documentation object.
-  // @return {String} - the formatted description of the array.
-  ///
-  formatArray: function formatArray(obj, arrName, arr) {
-    var output = "\t";
-    if (obj.fieldType === "class") {
-      if (arrName === "parameters") {
-        output += "constructor ";
-      } else if (arrName === "functions") {
-        output += "static ";
-      }
-    }
-
-    if (arrName !== "description") {
-      output += arrName + ":\n";
-    }
-
-    if (arr instanceof Array) {
-      output += arr.map(this.formatArrayElement.bind(this, arrName)).join("");
-    } else {
-      output += arr;
-    }
-    return output;
-  },
-  /////
-  // For individual elements of an array, formats the element so it fits well
-  // on the screen. Elements that are supposed to be inline, but have the ability
-  // to be drilled-down into, are truncated if they get to be more than 200
-  // characters wide.
-  //
-  // @param {String} arrName - the name of the array from which we retrieved elements.
-  // @param {String} n - one of the array elements.
-  // @param {Number} i - the index of the element in the array.
-  // @return {String} - the formatted element, including a newline at the end.
-  ///
-  formatArrayElement: function formatArrayElement(arrName, n, i) {
-    var s = "\t\t" + i + ": " + this.shortDescription(false, n);
-    if (n.description) {
-      s += " - " + n.description;
-
-      if (arrName !== "parameters" && arrName !== "properties" && arrName !== "methods" && s.length > 200) {
-        s = s.substring(0, 200) + "...";
-      }
-    }
-    s += "\n";
-    return s;
-  },
-  /////
-  // Describe an object by type, name, and parameters (if it's a function-type object).
-  // @param {Object} p - the documentation object to describe.
-  // @return {String} - the description of the documentation object.
-  ///
-  shortDescription: function shortDescription(topLevel, p) {
-    // This is the basic description that all objects get.
-    var output = "";
-    if (topLevel || p.type) {
-      output += "[" + (p.type || p.fieldType) + "] ";
-    }
-
-    output += topLevel ? p.fullName : p.name;
-
-    // But functions and classes take parameters, so they get slightly more.
-    if (p.fieldType === "function" || p.fieldType === "method") {
-      output += "(";
-      if (p.parameters) {
-        output += p.parameters.map(this.shortDescription.bind(this, false)).join(", ");
-      }
-      output += ")";
-    }
-
-    return output;
-  }
-};
-
-// The namespacing object we're going to return to the importing script.
-var pliny = formatters.console.format;
-// Give the user access to the database.
-pliny.database = database;
-// Give the user access to all of the formatters.
-pliny.formats = formatters;
-// Just get the raw data
-pliny.get = openBag.bind(null, pliny.database);
-// Forward on the markdown functionality
-pliny.markdown = marked;
-
-// Strip pliny calls out of a source file and deposit them into a separate file.
-pliny.carve = function (source, libFile, docFile, callback) {
-  var fs = require("fs");
-  fs.readFile(source, "utf-8", function (err, txt) {
-    var output = pliny.extract(txt);
-    pliny.write(libFile, docFile, output, callback);
-  });
-};
-
-pliny.extract = function (txt) {
-  var test = /pliny\.\w+/g,
-      left = 0,
-      outputLeft = "",
-      outputRight = "",
-      matches = test.exec(txt);
-  while (matches) {
-    var sub = txt.substring(left, matches.index);
-    outputLeft += sub;
-    var depth = 0,
-        inString = false,
-        found = false;
-    for (left = matches.index + matches.length; left < txt.length; ++left) {
-      if (txt[left] === "\"" && (left === 0 || txt[left - 1] !== "\\")) {
-        inString = !inString;
-      }
-      if (!inString) {
-        if (txt[left] === "(") {
-          found = true;
-          ++depth;
-        } else if (txt[left] === ")") {
-          --depth;
+    /////
+    // Puts together lists of parameters for function signatures, as well as
+    // lists of properties and methods for classes and the like.
+    //
+    // @param {Object} obj - the documentation object from which to read an array.
+    // @param {String} arrName - the name of the array to read from the documentation object.
+    // @param {Array} arr - the array from which we're reading values.
+    // @return {String} - the formatted description of the array.
+    ///
+    formatArray: function formatArray(obj, arrName, arr) {
+      var output = "<h2>";
+      if (obj.fieldType === "class") {
+        if (arrName === "parameters") {
+          output += "constructor ";
+        } else if (arrName === "functions") {
+          output += "static ";
         }
       }
-      if (depth === 0 && found) {
-        break;
+
+      if (arrName !== "description") {
+        output += arrName;
+      }
+
+      output += "</h2>";
+
+      var formatterName = arrName + "Format";
+      if (this[formatterName]) {
+        output += this[formatterName](obj, arr);
+      } else {
+        output += "<ul class=\"" + arrName + "\">" + arr.map(this.formatArrayElement.bind(this, arrName)).join("") + "</ul>";
+      }
+      return output;
+    },
+
+
+    /////
+    // For individual elements of an array, formats the element so it fits well
+    // on the screen.
+    //
+    // @param {String} arrName - the name of the array from which we retrieved elements.
+    // @param {String} n - one of the array elements.
+    // @return {String} - the formatted element, including a newline at the end.
+    ///
+    formatArrayElement: function formatArrayElement(arrName, n) {
+      var s = "<li>";
+      if (n.description) {
+        var desc = n.description;
+        if (n.optional) {
+          desc = "(Optional) " + desc;
+        }
+
+        if (n.default !== undefined) {
+          desc += " Defaults to <code>" + n.default + "</code>.";
+        }
+
+        s += "<dl><dt>" + this.shortDescription(false, n) + "</dt><dd>" + marked(desc) + "</dd></dl>";
+      } else {
+        s += this.shortDescription(false, n);
+      }
+      s += "</li>";
+      return s;
+    },
+
+
+    /////
+    // Describe an object by type, name, and parameters (if it's a function-type object).
+    // @param {Object} p - the documentation object to describe.
+    // @return {String} - the description of the documentation object.
+    ///
+    shortDescription: function shortDescription(topLevel, p) {
+      var output = "",
+          tag = topLevel ? "h1" : "span",
+          isFunction = p.fieldType === "function" || p.fieldType === "method" || p.fieldType === "event",
+          isContainer = isFunction || p.fieldType === "class" || p.fieldType === "namespace" || p.fieldType === "enumeration" || p.fieldType === "subClass" || p.fieldType === "record";
+
+      output += "<" + tag + ">";
+      if (isContainer && !topLevel) {
+        output += "<a href=\"index.html#" + p.id + "\">";
+      }
+
+      output += "<code>" + (topLevel && p.fieldType !== "example" && p.fullName || p.name);
+
+      if (p.type) {
+        output += " <span class=\"type\">" + p.type + "</span>";
+      }
+
+      // But functions and classes take parameters, so they get slightly more.
+      if (isFunction) {
+        output += "<ol class=\"signatureParameters\">";
+        if (p.parameters) {
+          output += "<li>" + p.parameters.map(function (p) {
+            return p.name;
+          }).join("</li><li>") + "</li>";
+        }
+        output += "</ol>";
+      }
+
+      if (isContainer && !topLevel) {
+        output += "</a>";
+      }
+
+      return output + "</code></" + tag + ">";
+    }
+  },
+
+  // Output to the Developer console in the browser directly.
+  console: {
+    format: function format(name) {
+      return formatters.format.call(formatters.console, name);
+    },
+
+
+    /////
+    // Puts together a string that describes a top-level field out of a documentation
+    // object.
+    //
+    // @params {Object} obj - the documentation object out of which we're retrieving the field.
+    // @params {String} p - the name of the field we're retrieving out of the documentation object.
+    // @return {String} - a description of the field.
+    ///
+    formatField: function formatField(obj, propertyName, value) {
+      if (value instanceof Array) {
+        return this.formatArray(obj, propertyName, value);
+      } else if (propertyName === "description") {
+        return "\t" + value + "\n";
+      } else {
+        return "\t" + propertyName + ": " + value + "\n";
+      }
+    },
+
+
+    /////
+    // Puts together lists of parameters for function signatures, as well as
+    // lists of properties and methods for classes and the like.
+    //
+    // @param {Object} obj - the documentation object from which to read an array.
+    // @param {String} arrName - the name of the array to read from the documentation object.
+    // @return {String} - the formatted description of the array.
+    ///
+    formatArray: function formatArray(obj, arrName, arr) {
+      var output = "\t";
+      if (obj.fieldType === "class") {
+        if (arrName === "parameters") {
+          output += "constructor ";
+        } else if (arrName === "functions") {
+          output += "static ";
+        }
+      }
+
+      if (arrName !== "description") {
+        output += arrName + ":\n";
+      }
+
+      if (arr instanceof Array) {
+        output += arr.map(this.formatArrayElement.bind(this, arrName)).join("");
+      } else {
+        output += arr;
+      }
+      return output;
+    },
+
+
+    /////
+    // For individual elements of an array, formats the element so it fits well
+    // on the screen. Elements that are supposed to be inline, but have the ability
+    // to be drilled-down into, are truncated if they get to be more than 200
+    // characters wide.
+    //
+    // @param {String} arrName - the name of the array from which we retrieved elements.
+    // @param {String} n - one of the array elements.
+    // @param {Number} i - the index of the element in the array.
+    // @return {String} - the formatted element, including a newline at the end.
+    ///
+    formatArrayElement: function formatArrayElement(arrName, n, i) {
+      var s = "\t\t" + i + ": " + this.shortDescription(false, n);
+      if (n.description) {
+        s += " - " + n.description;
+
+        if (arrName !== "parameters" && arrName !== "properties" && arrName !== "methods" && s.length > 200) {
+          s = s.substring(0, 200) + "...";
+        }
+      }
+      s += "\n";
+      return s;
+    },
+
+
+    /////
+    // Describe an object by type, name, and parameters (if it's a function-type object).
+    // @param {Object} p - the documentation object to describe.
+    // @return {String} - the description of the documentation object.
+    ///
+    shortDescription: function shortDescription(topLevel, p) {
+      // This is the basic description that all objects get.
+      var output = "";
+      if (topLevel || p.type) {
+        output += "[" + (p.type || p.fieldType) + "] ";
+      }
+
+      output += topLevel ? p.fullName : p.name;
+
+      // But functions and classes take parameters, so they get slightly more.
+      if (p.fieldType === "function" || p.fieldType === "method") {
+        output += "(";
+        if (p.parameters) {
+          output += p.parameters.map(this.shortDescription.bind(this, false)).join(", ");
+        }
+        output += ")";
+      }
+
+      return output;
+    }
+  }
+};
+var analyzers = ["namespace", "event", "function", "value", "class", "property", "method", "enumeration", "record", "subClass", "example", "error", "issue", "comment"].reduce(function (obj, k) {
+  obj[k] = analyzeObject.bind(null, k);
+  return obj;
+}, {});
+var pliny = Object.assign(formatters.console.format, analyzers, {
+  // Give the user access to the database.
+  database: database,
+  // Give the user access to all of the formatters
+  formatters: formatters,
+  // Just get the raw data
+  get: openBag.bind(null, database),
+  // Forward on the markdown functionality
+  markdown: marked,
+
+  // Strip pliny calls out of a source file and deposit them into a separate file.
+  carve: function carve(source, libFile, docFile, callback) {
+    var fs = require("fs");
+    fs.readFile(source, "utf-8", function (err, txt) {
+      var output = this.extract(txt);
+      this.write(libFile, docFile, output, callback);
+    });
+  },
+  extract: function extract(txt) {
+    var test = /pliny\.\w+/g,
+        left = 0,
+        outputLeft = "",
+        outputRight = "",
+        matches = test.exec(txt),
+        stringDelims = ['"', "'", "`"];
+    while (matches) {
+      var sub = txt.substring(left, matches.index),
+          depth = 0,
+          inString = false,
+          curDelim = null,
+          found = false;
+
+      outputLeft += sub;
+
+      for (left = matches.index + matches.length; left < txt.length; ++left) {
+        var curChar = txt[left],
+            delimIdx = stringDelims.indexOf(curChar),
+            stringStarted = !inString && delimIdx > -1,
+            stringEnded = inString && curChar === curDelim,
+            escaped = left > 0 && txt[left - 1] === "\\";
+
+        if ((stringStarted || stringEnded) && !escaped) {
+          inString = !inString;
+          if (inString) {
+            curDelim = curChar;
+          } else {
+            curDelim = null;
+          }
+        }
+
+        if (!inString) {
+          if (txt[left] === "(") {
+            found = true;
+            ++depth;
+          } else if (txt[left] === ")") {
+            --depth;
+          }
+        }
+        if (depth === 0 && found) {
+          break;
+        }
+      }
+      while (left < txt.length && /[;\) \r\n]/.test(txt[left])) {
+        left++;
+      }
+
+      outputRight += txt.substring(matches.index, left);
+      matches = test.exec(txt);
+    }
+    outputLeft += txt.substring(left);
+    return {
+      left: outputLeft,
+      right: outputRight
+    };
+  },
+  write: function write(libFile, outputLeft, docFile, outputRight, callback) {
+    if (docFile) {
+      if (!outputRight) {
+        console.warn("no documentation to write to " + docFile);
+      } else {
+        callback = function (cb) {
+          fs.writeFile(docFile, outputRight, cb);
+        }.bind(null, callback);
       }
     }
-    while (left < txt.length && /[;\) \r\n]/.test(txt[left])) {
-      left++;
-    }
-
-    outputRight += txt.substring(matches.index, left);
-    matches = test.exec(txt);
+    fs.writeFile(libFile, outputLeft, callback);
   }
-  outputLeft += txt.substring(left);
-  return {
-    left: outputLeft,
-    right: outputRight
-  };
-};
-
-pliny.write = function (libFile, outputLeft, docFile, outputRight, callback) {
-  if (docFile) {
-    if (!outputRight) {
-      console.warn("no documentation to write to " + docFile);
-    } else {
-      callback = function (cb) {
-        fs.writeFile(docFile, outputRight, cb);
-      }.bind(null, callback);
-    }
-  }
-  fs.writeFile(libFile, outputLeft, callback);
-};
-
-// Create documentation functions for each of the supported types of code objects.
-["namespace", "event", "function", "value", "class", "property", "method", "enumeration", "record", "subClass", "example", "error", "issue", "comment"].forEach(function (k) {
-  pliny[k] = pliny[k] || analyzeObject.bind(null, k);
 });
 
 return pliny;

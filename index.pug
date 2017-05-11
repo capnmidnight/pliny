@@ -1,0 +1,25 @@
+doctype html
+html
+  head
+    title Test logger
+    != liveReload
+    script(src="pliny" + jsExt)
+  body
+    pre
+  script(src= "test.js")
+  script(type="text/javascript").
+    var pre = document.querySelector("pre");
+
+    pre.appendChild(document.createTextNode(pliny("Hello.World")));
+    pre.appendChild(document.createTextNode("\n"));
+
+    fetch("test.js")
+      .then((res) => res.text())
+      .then((script) => pliny.extract(script))
+      .then((obj) => {
+        pre.appendChild(document.createTextNode(obj.left));
+        pre.appendChild(document.createTextNode("\n"));
+        pre.appendChild(document.createTextNode(obj.right));
+      });
+
+    Hello.World();
