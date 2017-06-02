@@ -9,7 +9,7 @@ var gulp = require("gulp"),
     format: "umd",
     dependencies: ["format"],
     sourceMap: true,
-    extractDocumentation: true,
+    extractDocumentation: false,
     disableGenerators: true
   }),
   html = marigold.html(["*.pug"]),
