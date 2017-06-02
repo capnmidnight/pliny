@@ -1469,6 +1469,7 @@ function analyzeObject(fieldType, info) {
       if (info.parent === undefined) {
         info.parent = info.baseClass;
       }
+      pliny.subClass(info);
     }
 
     for (var k in subArrays) {
@@ -1578,7 +1579,15 @@ function setEnumerationValues(name) {
   } else {
     for (var key in enumeration) {
       var val = enumeration[key];
-      if (enumeration.hasOwnProperty(key) && typeof val === "number") {}
+      if (enumeration.hasOwnProperty(key) && typeof val === "number") {
+        pliny.value({
+          parent: name,
+          name: key,
+          type: "Number",
+          description: val.toString(),
+          value: val
+        });
+      }
     }
   }
 }
@@ -1776,7 +1785,8 @@ var formatters = {
       } else if (value instanceof Array) {
         output += this.formatArray(obj, propertyName, value);
       } else if (propertyName === "parent") {
-        var box = output += '<p>Contained in <a href="index.html#' + box.id + '"><code>' + value + '</code></a></p>';
+        var box = pliny.get(value);
+        output += '<p>Contained in <a href="index.html#' + box.id + '"><code>' + value + '</code></a></p>';
       } else if (propertyName === "description") {
         output += marked(value);
       } else if (propertyName === "returns") {
