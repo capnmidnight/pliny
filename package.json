@@ -22,6 +22,7 @@
     "pliny-formatter.min.js"
   ],
   "main": "index.js",
+  "module": "src/client/index.js",
   "keywords": [
     "documentation"
   ],
