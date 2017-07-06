@@ -1,7 +1,7 @@
 {
   "name": "pliny",
   "description": "Pliny is a documentation construction system. You create live documentation objects on code assets with pliny, then you read back those documentation objects with pliny.",
-  "version": "3.4.3",
+  "version": "4.0.0",
   "author": "Sean T. McBeth <sean@seanmcbeth.com> (https://www.seanmcbeth.com)",
   "license": "GPL-3.0",
   "homepage": "https://github.com/capnmidnight/pliny",
@@ -23,6 +23,9 @@
   ],
   "devDependencies": {
     "marked": "^0.3.5",
-    "marigold-build": "^1.5.5"
+    "marigold-build": "^1.10.8"
+  },
+  "dependencies": {
+    "rollup-pluginutils": "^2.0.1"
   }
 }

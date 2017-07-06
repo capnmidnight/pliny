@@ -1,3 +1,5 @@
+import pliny from "../src/client";
+
 pliny.function({
   parent: "Hello",
   name: "World",
@@ -24,3 +26,5 @@ const Hello = {
     console.log("Hello, world");
   }
 };
+
+export default Hello;

@@ -1,0 +1,13 @@
+doctype html
+html
+  head
+    title Test recorder
+    != liveReload
+  body
+    pre
+  script(src="pliny" + jsExt)
+  script(src= "testRecording.doc" + jsExt)
+  script(type="text/javascript").
+    var pre = document.querySelector("pre");
+    console.log(pliny);
+    pre.appendChild(document.createTextNode(JSON.stringify(pliny.database, null, 2)));
