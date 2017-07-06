@@ -15,9 +15,13 @@
     "README.md",
     "index.js",
     "pliny.js",
-    "pliny.min.js"
+    "pliny.min.js",
+    "pliny-extractor.js",
+    "pliny-extractor.min.js",
+    "pliny-formatter.js",
+    "pliny-formatter.min.js",
   ],
-  "main": "pliny.js",
+  "main": "index.js",
   "keywords": [
     "documentation"
   ],
