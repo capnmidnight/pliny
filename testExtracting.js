@@ -12,19 +12,22 @@ function extract(txt){
 
     startLib = /\s*\/\/ BEGIN PLINY\s*/,
     startLibMatch = txt.match(startLib),
-    startLibLength = startLibMatch[0].length,
-    startLibIndex = startLibMatch.index,
-    startLibEnd = startLibIndex + startLibLength,
-
     endLib = /\s*\/\/ END PLINY\s*/,
-    endLibMatch = txt.match(endLib),
-    endLibLength = endLibMatch[0].length,
-    endLibStart = endLibMatch.index,
-    endLibIndex = endLibStart + endLibLength,
+    endLibMatch = txt.match(endLib);
 
-    sub = txt.substring(startLibIndex, endLibIndex);
+  if(startLibMath && endLibMatch) {
 
-  txt = txt.substring(0, startLibIndex) + txt.substring(endLibIndex);
+    var startLibLength = startLibMatch[0].length,
+      startLibIndex = startLibMatch.index,
+      startLibEnd = startLibIndex + startLibLength,
+      endLibLength = endLibMatch[0].length,
+      endLibStart = endLibMatch.index,
+      endLibIndex = endLibStart + endLibLength;
+
+    if(0 <= startLibIndex && startLibIndex <= endLibIndex && endLibIndex < txt.length) {
+      txt = txt.substring(0, startLibIndex) + txt.substring(endLibIndex);
+    }
+  }
 
   var matches = test.exec(txt),
     stringDelims = ['"', "'", "`"];

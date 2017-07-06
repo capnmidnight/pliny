@@ -19,7 +19,7 @@
     "pliny-extractor.js",
     "pliny-extractor.min.js",
     "pliny-formatter.js",
-    "pliny-formatter.min.js",
+    "pliny-formatter.min.js"
   ],
   "main": "index.js",
   "keywords": [
