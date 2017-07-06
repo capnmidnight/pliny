@@ -40,7 +40,9 @@ export function rollupPlugin(options) {
     transform ( code, id ) {
       if (filter(id) && !/package\.json$/.test(id) && code.indexOf("pliny") > -1) {
         var obj = extract(code);
-        documentation = obj.right;
+        if(obj.right && obj.right.length > 0) {
+          documentation += obj.right;
+        }
         return obj.left;
       }
     },

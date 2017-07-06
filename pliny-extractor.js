@@ -3577,6 +3577,9 @@ var blacklisted = Object.create( null );
 reservedWords.concat( builtins ).forEach( function (word) { return blacklisted[ word ] = true; } );
 
 function extract(txt){
+
+  txt = txt.replace(/import \w+ from "pliny"/g, "");
+
   var test = /pliny\.\w+/g,
     left = 0,
     outputLeft = "",
@@ -3587,7 +3590,7 @@ function extract(txt){
     endLib = /\s*\/\/ END PLINY\s*/,
     endLibMatch = txt.match(endLib);
 
-  if(startLibMath && endLibMatch) {
+  if(startLibMatch && endLibMatch) {
 
     var startLibLength = startLibMatch[0].length,
       startLibIndex = startLibMatch.index,
@@ -3690,7 +3693,9 @@ function rollupPlugin(options) {
     transform ( code, id ) {
       if (filter(id) && !/package\.json$/.test(id) && code.indexOf("pliny") > -1) {
         var obj = extract(code);
-        documentation = obj.right;
+        if(obj.right && obj.right.length > 0) {
+          documentation += obj.right;
+        }
         return obj.left;
       }
     },

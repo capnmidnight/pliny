@@ -4,8 +4,6 @@
 	(global.plinyFormatter = factory());
 }(this, (function () { 'use strict';
 
-// BEGIN PLINY
-
 // Walks through dot-accessors to retrieve an object out of a root object.
 //
 // @param {Object} bag - the root object.
@@ -1460,6 +1458,19 @@ marked.parse = marked;
 }());
 });
 
+// Walks through dot-accessors to retrieve an object out of a root object.
+//
+// @param {Object} bag - the root object.
+// @param {String} name - a period-delimited list of object accessors, naming the object we want to access.
+// @returns {Object} - the object we asked for, or undefined, if it doesn't exist.
+function openBag$1(bag, name) {
+  // Break up the object path, then recurse through objects until we either run
+  // out of objects or find the one we're looking for.
+  return name
+    .split(".")
+    .reduce((obj, p) => obj[p], bag);
+}
+
 // Figures out if the maybeName parameter is a bag or a string path to a bag,
 // then either gives you back the bag, or finds the bag that the path refers to
 // and gives you that.
@@ -1469,7 +1480,7 @@ marked.parse = marked;
 // @returns {Object} - the object we asked for, or undefined, if it doesn't exist.
 function resolveBag(bag, maybeName) {
   if (typeof maybeName === "string" || maybeName instanceof String) {
-    return openBag(bag, maybeName);
+    return openBag$1(bag, maybeName);
   }
   else {
     return maybeName;

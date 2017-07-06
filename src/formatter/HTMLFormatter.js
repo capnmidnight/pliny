@@ -1,6 +1,18 @@
 import markdown from "marked";
 import FormatWriter from "./FormatWriter";
-import openBag from "../openBag";
+
+// Walks through dot-accessors to retrieve an object out of a root object.
+//
+// @param {Object} bag - the root object.
+// @param {String} name - a period-delimited list of object accessors, naming the object we want to access.
+// @returns {Object} - the object we asked for, or undefined, if it doesn't exist.
+function openBag(bag, name) {
+  // Break up the object path, then recurse through objects until we either run
+  // out of objects or find the one we're looking for.
+  return name
+    .split(".")
+    .reduce((obj, p) => obj[p], bag);
+}
 
 // Figures out if the maybeName parameter is a bag or a string path to a bag,
 // then either gives you back the bag, or finds the bag that the path refers to

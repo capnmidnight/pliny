@@ -19,6 +19,7 @@ function openBag(bag, name) {
     .reduce((obj, p) => obj[p], bag);
 }
 
+
 function hash(buf) {
   let s1 = 1, s2 = 0;
   buf.split("")

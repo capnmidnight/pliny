@@ -1,4 +1,7 @@
 export default function extract(txt){
+
+  txt = txt.replace(/import \w+ from "pliny"/g, "");
+
   var test = /pliny\.\w+/g,
     left = 0,
     outputLeft = "",
@@ -9,7 +12,7 @@ export default function extract(txt){
     endLib = /\s*\/\/ END PLINY\s*/,
     endLibMatch = txt.match(endLib);
 
-  if(startLibMath && endLibMatch) {
+  if(startLibMatch && endLibMatch) {
 
     var startLibLength = startLibMatch[0].length,
       startLibIndex = startLibMatch.index,

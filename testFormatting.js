@@ -19,6 +19,7 @@ function openBag(bag, name) {
     .reduce((obj, p) => obj[p], bag);
 }
 
+
 function hash(buf) {
   let s1 = 1, s2 = 0;
   buf.split("")
@@ -432,6 +433,19 @@ const pliny$1 = Object.assign({
 
 // END PLINY
 
+// Walks through dot-accessors to retrieve an object out of a root object.
+//
+// @param {Object} bag - the root object.
+// @param {String} name - a period-delimited list of object accessors, naming the object we want to access.
+// @returns {Object} - the object we asked for, or undefined, if it doesn't exist.
+function openBag$1(bag, name) {
+  // Break up the object path, then recurse through objects until we either run
+  // out of objects or find the one we're looking for.
+  return name
+    .split(".")
+    .reduce((obj, p) => obj[p], bag);
+}
+
 class FormatWriter {
   /////
   // Find a particular object and print out the documentation for it.
@@ -441,7 +455,7 @@ class FormatWriter {
   format(database, name) {
     var obj = null;
     if (typeof name === "string" || name instanceof String) {
-      obj = openBag(database, name);
+      obj = openBag$1(database, name);
     }
     else {
       obj = name;
@@ -1873,6 +1887,19 @@ marked.parse = marked;
 }());
 });
 
+// Walks through dot-accessors to retrieve an object out of a root object.
+//
+// @param {Object} bag - the root object.
+// @param {String} name - a period-delimited list of object accessors, naming the object we want to access.
+// @returns {Object} - the object we asked for, or undefined, if it doesn't exist.
+function openBag$2(bag, name) {
+  // Break up the object path, then recurse through objects until we either run
+  // out of objects or find the one we're looking for.
+  return name
+    .split(".")
+    .reduce((obj, p) => obj[p], bag);
+}
+
 // Figures out if the maybeName parameter is a bag or a string path to a bag,
 // then either gives you back the bag, or finds the bag that the path refers to
 // and gives you that.
@@ -1882,7 +1909,7 @@ marked.parse = marked;
 // @returns {Object} - the object we asked for, or undefined, if it doesn't exist.
 function resolveBag(bag, maybeName) {
   if (typeof maybeName === "string" || maybeName instanceof String) {
-    return openBag(bag, maybeName);
+    return openBag$2(bag, maybeName);
   }
   else {
     return maybeName;
