@@ -1,4 +1,4 @@
-import pliny from "../src/client";
+import pliny from "../";
 
 pliny.function({
   parent: "Hello",
