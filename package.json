@@ -31,8 +31,8 @@
     "documentation"
   ],
   "devDependencies": {
-    "marked": "^0.3.5",
-    "marigold-build": "^1.10.8"
+    "marigold-build": "^1.11.1",
+    "marked": "^0.3.5"
   },
   "dependencies": {
     "rollup-pluginutils": "^2.0.1"
